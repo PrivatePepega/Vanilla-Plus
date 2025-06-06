@@ -32,8 +32,6 @@ const Introduction = () => {
 
 
 
-
-
 const activeAccount = useActiveAccount();
 
 const [page, setPage] = useState(0);
