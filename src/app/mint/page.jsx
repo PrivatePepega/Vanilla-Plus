@@ -105,7 +105,15 @@ const Mint = () => {
 
 
 
-
+      <div className="flex flex-col justify-center items-center my-6">
+        <h2>
+          Go to our github, on the right side of the page click on releases,
+        </h2>
+        <h2>
+          and download the latest version of the app for your OS.
+        </h2>
+        <Link href="https://github.com/source-dao/source-dao-app/releases">Github Link</Link>
+      </div>
 
       <WoWUpload/>
         
