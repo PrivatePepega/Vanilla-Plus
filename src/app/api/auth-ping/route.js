@@ -3,7 +3,6 @@ import { chainById } from '@/utils/thirdweb/chains';
 import crypto from 'crypto';
 import { SecretsManagerClient, GetSecretValueCommand } from '@aws-sdk/client-secrets-manager';
 import { NextResponse } from 'next/server';
-import {contractAddresses} from "@/utils/contractAddressHardhat"
 import { readContract } from 'thirdweb'; 
 import { contractPassport } from "@/utils/functionDump/getContracts"
 
@@ -164,6 +163,9 @@ EQIDAQAB
 
     const [fileHash, gameName, secret, userPassword, signedType, timeField, accountName] = decrypted;
 
+console.log("say accountName:", accountName);
+
+
     // Validate inputs
     if (secret !== APP_SECRET) return NextResponse.json({ error: 'Invalid app secret' }, { status: 401 });
     if (game !== gameName || type !== signedType) return NextResponse.json({ error: 'Mismatched game or type' }, { status: 400 });
@@ -176,7 +178,7 @@ EQIDAQAB
       const blockchainPasswordHash = await readContract({
         contract: contractPassport,
         method: "function viewUserPassword(address _user) view returns (string memory)",
-        params: [wallet.wallet]
+        params: [wallet]
       });
 
 
