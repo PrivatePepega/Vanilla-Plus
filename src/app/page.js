@@ -57,7 +57,7 @@ export default function Home() {
           <div>you do not possess a passport my fren,</div>
         )}
         <ConnectButton client={client} chain={chainById} connectButton={{ label: "Login" }}/>
-        <Link href="/login/introduction">
+        <Link href="https://guildbank.biz/login/introduction">
           <Button className="w-40">Join GuildBank-(its free)</Button>    
         </Link>
           <Socials />

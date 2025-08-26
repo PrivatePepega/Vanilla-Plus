@@ -45,7 +45,7 @@ export default function Navbar () {
         <Link href="/guild">
           <li>guild</li>
         </Link>
-        <Link href="/user">
+        <Link href="/https://guildbank.biz/user">
           <li>user</li>
         </Link>
         <li>

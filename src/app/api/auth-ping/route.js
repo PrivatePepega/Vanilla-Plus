@@ -262,7 +262,5 @@ console.log("say accountName:", accountName);
     console.error('Auth ping error:', { error: err.message });
     return NextResponse.json({ error: 'Server error' }, { status: 500 });
   }
-
-
 }
 
