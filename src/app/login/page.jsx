@@ -32,7 +32,7 @@ const Login = () => {
         <Link href="/">
           <ConnectButton client={client} chain={chainById} connectButton={{ label: "Login" }}/>
         </Link>
-        <Link href="/login/introduction">
+        <Link href="https://guildbank.biz/login/introduction">
           <Button className="w-40">Join GuildBank (it's free)</Button>    
         </Link>
       </div>
