@@ -2,7 +2,7 @@
 
 import { ButtonGroup, Button, Input } from "@material-tailwind/react";
 
-import { gameContractGovernorElection, gameContractSourceDAO, gameContractBallot} from "@/utils/functionDump/getContracts"
+import { contractGovernorElection, contractSourceDAO, contractBallot} from "@/utils/functionDump/getContracts"
 import { useReadContract } from "thirdweb/react";
 import { useSendTransaction } from "thirdweb/react";
 import { prepareContractCall } from "thirdweb";
@@ -29,19 +29,18 @@ const BoDElectionComponent = () => {
 
 
     const { data: showVotingPower, isLoading: votingLoad } = useReadContract({
-        contract: gameContractSourceDAO,
+        contract: contractSourceDAO,
         method: "function showVotingUnits(address account) returns (uint256)",
         params: [activeAccount ? activeAccount.address : null],
       });
 
-
     const { data: getElectionSeason, getElectionSeasonLoading } = useReadContract({
-        contract: gameContractGovernorElection,
+        contract: contractGovernorElection,
         method: "function getElectionSeason() returns(bool)",
     });
 
     const { data: getEndTimer, isLoading: endTimeLoading } = useReadContract({
-        contract: gameContractGovernorElection,
+        contract: contractGovernorElection,
         method: "function electionEndedTimer() returns (uint256)",
     });
     const now = new Date();
@@ -55,7 +54,7 @@ const BoDElectionComponent = () => {
     const { mutate: startElection, data: startElectionData } = useSendTransaction();
         const startElectionTx = () => {
         const startElectionTransaction = prepareContractCall({
-        contract: gameContractGovernorElection,
+        contract: contractGovernorElection,
         method: "function startElection() public",
         })
         startElection(startElectionTransaction);
@@ -64,7 +63,7 @@ const BoDElectionComponent = () => {
     const { mutate: endElection, data: endElectionData } = useSendTransaction();
         const endElectionTx = () => {
         const endElectionTransaction = prepareContractCall({
-        contract: gameContractGovernorElection,
+        contract: contractGovernorElection,
         method: "function endElection() public",
         })
         endElection(endElectionTransaction);
@@ -79,18 +78,18 @@ const BoDElectionComponent = () => {
     // CEO// CEO// CEO// CEO// CEO// CEO// CEO
     // CEO// CEO// CEO// CEO// CEO// CEO// CEO
     const { data: CEO, CEOLoading } = useReadContract({
-        contract: gameContractGovernorElection,
+        contract: contractGovernorElection,
         method: "function CEO() returns(address)",
     });
     const { data: viewTopCandidatesCEOArray, viewTopCandidatesCEOArrayLoading } = useReadContract({
-        contract: gameContractBallot,
+        contract: contractBallot,
         method: "function viewTopCandidatesCEOArray() returns (address[5])",
     });
     const { mutate: activationCEO, data: activationCEOData } = useSendTransaction();
     const activationCEOTx = () => {
       const activationCEOTransaction = prepareContractCall({
-      contract: gameContractGovernorElection,
-      method: "function activationCEO ()",
+      contract: contractGovernorElection,
+      method: "function activationCEO()",
       })
       activationCEO(activationCEOTransaction);
     };
@@ -106,18 +105,18 @@ const BoDElectionComponent = () => {
     // CTO// CTO// CTO// CTO// CTO// CTO// CTO// CTO
     // CTO// CTO// CTO// CTO// CTO// CTO// CTO// CTO
     const { data: CTO, CTOLoading } = useReadContract({
-        contract: gameContractGovernorElection,
+        contract: contractGovernorElection,
         method: "function CTO() returns(address)",
     });
     const { data: viewTopCandidatesCTOArray, viewTopCandidatesCTOArrayLoading } = useReadContract({
-        contract: gameContractBallot,
+        contract: contractBallot,
         method: "function viewTopCandidatesCTOArray() returns (address[5])",
     });
     const { mutate: activationCTO, data: activationCTOData } = useSendTransaction();
     const activationCTOTx = () => {
       const activationCTOTransaction = prepareContractCall({
-      contract: gameContractGovernorElection,
-      method: "function activationCTO ()",
+      contract: contractGovernorElection,
+      method: "function activationCTO()",
       })
       activationCTO(activationCTOTransaction);
     };
@@ -134,18 +133,18 @@ const BoDElectionComponent = () => {
     // CFO// CFO// CFO// CFO// CFO// CFO// CFO// CFO
     // CFO// CFO// CFO// CFO// CFO// CFO// CFO// CFO
     const { data: CFO, CFOLoading } = useReadContract({
-        contract: gameContractGovernorElection,
+        contract: contractGovernorElection,
         method: "function CFO() returns(address)",
     });
     const { data: viewTopCandidatesCFOArray, viewTopCandidatesCFOArrayLoading } = useReadContract({
-        contract: gameContractBallot,
+        contract: contractBallot,
         method: "function viewTopCandidatesCFOArray() returns (address[5])",
     });
     const { mutate: activationCFO, data: activationCFOData } = useSendTransaction();
     const activationCFOTx = () => {
       const activationCFOTransaction = prepareContractCall({
-      contract: gameContractGovernorElection,
-      method: "function activationCFO ()",
+      contract: contractGovernorElection,
+      method: "function activationCFO()",
       })
       activationCFO(activationCFOTransaction);
     };
@@ -159,18 +158,18 @@ const BoDElectionComponent = () => {
 // CCO// CCO// CCO// CCO// CCO// CCO// CCO// CCO
 // CCO// CCO// CCO// CCO// CCO// CCO// CCO// CCO
     const { data: CCO, CCOLoading } = useReadContract({
-        contract: gameContractGovernorElection,
+        contract: contractGovernorElection,
         method: "function CCO() returns(address)",
     });
     const { data: viewTopCandidatesCCOArray, viewTopCandidatesCCOArrayLoading } = useReadContract({
-        contract: gameContractBallot,
+        contract: contractBallot,
         method: "function viewTopCandidatesCCOArray() returns (address[5])",
     });
     const { mutate: activationCCO, data: activationCCOData } = useSendTransaction();
     const activationCCOTx = () => {
       const activationCCOTransaction = prepareContractCall({
-      contract: gameContractGovernorElection,
-      method: "function activationCCO ()",
+      contract: contractGovernorElection,
+      method: "function activationCCO()",
       })
       activationCCO(activationCCOTransaction);
     };
@@ -184,18 +183,18 @@ const BoDElectionComponent = () => {
 // COO// COO// COO// COO// COO// COO// COO// COO
 // COO// COO// COO// COO// COO// COO// COO// COO
     const { data: COO, COOLoading } = useReadContract({
-        contract: gameContractGovernorElection,
+        contract: contractGovernorElection,
         method: "function COO() returns(address)",
     });
     const { data: viewTopCandidatesCOOArray, viewTopCandidatesCOOArrayLoading } = useReadContract({
-        contract: gameContractBallot,
+        contract: contractBallot,
         method: "function viewTopCandidatesCOOArray() returns (address[5])",
     });
     const { mutate: activationCOO, data: activationCOOData } = useSendTransaction();
     const activationCOOTx = () => {
       const activationCOOTransaction = prepareContractCall({
-      contract: gameContractGovernorElection,
-      method: "function activationCOO ()",
+      contract: contractGovernorElection,
+      method: "function activationCOO()",
       })
       activationCOO(activationCOOTransaction);
     };
@@ -205,7 +204,6 @@ const BoDElectionComponent = () => {
 
 
     const [VotingState, setVotingState] = useState(0);
-
 
 
 
@@ -294,7 +292,7 @@ const BoDElectionComponent = () => {
 
 
                     <div>
-                        {viewTopCandidatesCEOArray[0] === "0x0000000000000000000000000000000000000000" ?
+                        {viewTopCandidatesCEOArray[0] === "0x0000000000000000000000000000000000000000" && viewTopCandidatesCEOArray[1] === "0x0000000000000000000000000000000000000000" && viewTopCandidatesCEOArray[2] === "0x0000000000000000000000000000000000000000" && viewTopCandidatesCEOArray[3] === "0x0000000000000000000000000000000000000000" && viewTopCandidatesCEOArray[4] === "0x0000000000000000000000000000000000000000"?
                         (
                         <div>
                             <p>

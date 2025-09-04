@@ -7,7 +7,7 @@ import { useState, useEffect } from "react";
 
 // Contracts
 import { useReadContract } from "thirdweb/react";
-import {contractPassport, gameContractBoDTreasury, gameContractBoD } from "@/utils/functionDump/getContracts"
+import {contractPassport, contractSourceDAO, contractBoD } from "@/utils/functionDump/getContracts"
 
 import { MediaRenderer } from "thirdweb/react";
 
@@ -32,18 +32,18 @@ const BoDBODTabComponent = () => {
 
 
     const { data: showUserVotingUnits, showUserVotingUnitsLoading } = useReadContract({
-        contract: gameContractBoDTreasury,
+        contract: contractSourceDAO,
         method: "function showVotingUnits() returns (uint256])",
         params: [activeAccount ? activeAccount.address : null],
     });
 
     const { data: returnBoD, returnBoDLoading } = useReadContract({
-        contract: gameContractBoD,
+        contract: contractBoD,
         method: "function returnBoD() returns (address[16])",
     });
 
 
-
+console.log("returnBoD" , returnBoD);
 
 
 
@@ -65,14 +65,14 @@ const BoDBODTabComponent = () => {
         params: [returnBoD? returnBoD[1] : null],
     });
     const { data: showUser1VotingUnits, showUser1VotingUnitsLoading } = useReadContract({
-        contract: gameContractBoDTreasury,
+        contract: contractSourceDAO,
         method: "function showVotingUnits() returns (uint256])",
         params: [returnBoD? returnBoD[1] : null],
     });
     const { mutate: ChallengeUser1, data: ChallengeUser1Data } = useSendTransaction();
     const ChallengeUser1Tx = () => {
     const ChallengeUser1Transaction = prepareContractCall({
-        contract: gameContractBoD,
+        contract: contractBoD,
         method: "function challengeSenatorChair(uint8 index)returns (bool)",
         params: [1],
         })
@@ -90,7 +90,7 @@ const BoDBODTabComponent = () => {
     params: [returnBoD? returnBoD[2] : null],
   });
   const { data: showUser2VotingUnits, showUser2VotingUnitsLoading } = useReadContract({
-    contract: gameContractBoDTreasury,
+    contract: contractSourceDAO,
     method: "function showVotingUnits() returns (uint256])",
     params: [returnBoD? returnBoD[2] : null],
   });
@@ -114,14 +114,14 @@ const BoDBODTabComponent = () => {
     params: [returnBoD? returnBoD[3] : null],
   });
   const { data: showUser3VotingUnits, showUser3VotingUnitsLoading } = useReadContract({
-    contract: gameContractBoDTreasury,
+    contract: contractSourceDAO,
     method: "function showVotingUnits() returns (uint256])",
     params: [returnBoD? returnBoD[3] : null],
   });
   const { mutate: ChallengeUser3, data: ChallengeUser3Data } = useSendTransaction();
   const ChallengeUser3Tx = () => {
   const ChallengeUser3Transaction = prepareContractCall({
-    contract: gameContractBoD,
+    contract: contractBoD,
     method: "function challengeSenatorChair(uint8 index)returns (bool)",
     params: [3],
     })
@@ -138,14 +138,14 @@ const BoDBODTabComponent = () => {
     params: [returnBoD? returnBoD[4] : null],
   });
   const { data: showUser4VotingUnits, showUser4VotingUnitsLoading } = useReadContract({
-    contract: gameContractBoDTreasury,
+    contract: contractSourceDAO,
     method: "function showVotingUnits() returns (uint256])",
     params: [returnBoD? returnBoD[4] : null],
   });
   const { mutate: ChallengeUser4, data: ChallengeUser4Data } = useSendTransaction();
   const ChallengeUser4Tx = () => {
   const ChallengeUser4Transaction = prepareContractCall({
-    contract: gameContractBoD,
+    contract: contractBoD,
     method: "function challengeSenatorChair(uint8 index)returns (bool)",
     params: [4],
     })
@@ -165,14 +165,14 @@ const BoDBODTabComponent = () => {
     params: [returnBoD? returnBoD[5] : null],
   });
   const { data: showUser5VotingUnits, showUser5VotingUnitsLoading } = useReadContract({
-    contract: gameContractBoDTreasury,
+    contract: contractSourceDAO,
     method: "function showVotingUnits() returns (uint256])",
     params: [returnBoD? returnBoD[5] : null],
   });
   const { mutate: ChallengeUser5, data: ChallengeUser5Data } = useSendTransaction();
   const ChallengeUser5Tx = () => {
   const ChallengeUser5Transaction = prepareContractCall({
-    contract: gameContractBoD,
+    contract: contractBoD,
     method: "function challengeSenatorChair(uint8 index)returns (bool)",
     params: [5],
     })
@@ -195,14 +195,14 @@ const BoDBODTabComponent = () => {
     params: [returnBoD? returnBoD[6] : null],
   });
   const { data: showUser6VotingUnits, showUser6VotingUnitsLoading } = useReadContract({
-    contract: gameContractBoDTreasury,
+    contract: contractSourceDAO,
     method: "function showVotingUnits() returns (uint256])",
     params: [returnBoD? returnBoD[6] : null],
   });
   const { mutate: ChallengeUser6, data: ChallengeUser6Data } = useSendTransaction();
   const ChallengeUser6Tx = () => {
   const ChallengeUser6Transaction = prepareContractCall({
-    contract: gameContractBoD,
+    contract: contractBoD,
     method: "function challengeSenatorChair(uint8 index)returns (bool)",
     params: [6],
     })
@@ -224,14 +224,14 @@ const BoDBODTabComponent = () => {
     params: [returnBoD? returnBoD[7] : null],
   });
   const { data: showUser7VotingUnits, showUser7VotingUnitsLoading } = useReadContract({
-    contract: gameContractBoDTreasury,
+    contract: contractSourceDAO,
     method: "function showVotingUnits() returns (uint256])",
     params: [returnBoD? returnBoD[7] : null],
   });
   const { mutate: ChallengeUser7, data: ChallengeUser7Data } = useSendTransaction();
   const ChallengeUser7Tx = () => {
   const ChallengeUser7Transaction = prepareContractCall({
-    contract: gameContractBoD,
+    contract: contractBoD,
     method: "function challengeSenatorChair(uint8 index)returns (bool)",
     params: [7],
     })
@@ -250,14 +250,14 @@ const BoDBODTabComponent = () => {
     params: [returnBoD? returnBoD[8] : null],
   });
   const { data: showUser8VotingUnits, showUser8VotingUnitsLoading } = useReadContract({
-    contract: gameContractBoDTreasury,
+    contract: contractSourceDAO,
     method: "function showVotingUnits() returns (uint256])",
     params: [returnBoD? returnBoD[8] : null],
   });
   const { mutate: ChallengeUser8, data: ChallengeUser8Data } = useSendTransaction();
   const ChallengeUser8Tx = () => {
   const ChallengeUser8Transaction = prepareContractCall({
-    contract: gameContractBoD,
+    contract: contractBoD,
     method: "function challengeSenatorChair(uint8 index)returns (bool)",
     params: [8],
     })
@@ -279,14 +279,14 @@ const BoDBODTabComponent = () => {
     params: [returnBoD? returnBoD[9] : null],
   });
   const { data: showUser9VotingUnits, showUser9VotingUnitsLoading } = useReadContract({
-    contract: gameContractBoDTreasury,
+    contract: contractSourceDAO,
     method: "function showVotingUnits() returns (uint256])",
     params: [returnBoD? returnBoD[9] : null],
   });
   const { mutate: ChallengeUser9, data: ChallengeUser9Data } = useSendTransaction();
   const ChallengeUser9Tx = () => {
   const ChallengeUser9Transaction = prepareContractCall({
-    contract: gameContractBoD,
+    contract: contractBoD,
     method: "function challengeSenatorChair(uint8 index)returns (bool)",
     params: [9],
     })
@@ -306,14 +306,14 @@ const BoDBODTabComponent = () => {
     params: [returnBoD? returnBoD[10] : null],
   });
   const { data: showUser10VotingUnits, showUser10VotingUnitsLoading } = useReadContract({
-    contract: gameContractBoDTreasury,
+    contract: contractSourceDAO,
     method: "function showVotingUnits() returns (uint256])",
     params: [returnBoD? returnBoD[10] : null],
   });
   const { mutate: ChallengeUser10, data: ChallengeUser10Data } = useSendTransaction();
   const ChallengeUser10Tx = () => {
   const ChallengeUser10Transaction = prepareContractCall({
-    contract: gameContractBoD,
+    contract: contractBoD,
     method: "function challengeSenatorChair(uint8 index)returns (bool)",
     params: [10],
     })

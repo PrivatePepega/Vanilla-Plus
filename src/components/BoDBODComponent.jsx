@@ -9,7 +9,7 @@ import { Interface, getAddress, hexlify, toUtf8Bytes } from "ethers";
 // Contracts
 import { useActiveAccount } from "thirdweb/react";
 import { useReadContract } from "thirdweb/react";
-import { gameContractBoDTreasury } from "@/utils/functionDump/getContracts"
+import { contractBoDTreasury } from "@/utils/functionDump/getContracts"
 import { useSendTransaction } from "thirdweb/react";
 import { prepareContractCall } from "thirdweb";
 import BoDSubmitAction from "./BoDSubmitAction";
@@ -46,7 +46,7 @@ const BoDBODComponent = () => {
 
     
     const { data: showActionOnQueueArray, isLoading: showActionOnQueueArrayLoad } = useReadContract({
-      contract: gameContractBoDTreasury,
+      contract: contractBoDTreasury,
       method: "function showActionOnQueueArray() returns(uint256[] memory)",
     });
       
@@ -68,23 +68,23 @@ const BoDBODComponent = () => {
 
 
   const { data: ActionsVoteLedger, ActionsVoteLedgerLoading } = useReadContract({
-    contract: gameContractBoDTreasury,
+    contract: contractBoDTreasury,
     method: "function ActionsVoteLedger(uint256, address) public view returns (bool)",
     params: [actionTicket, activeAccount ? activeAccount.address : null],
   });
   const { data: actionTransaction, actionTransactionLoading } = useReadContract({
-    contract: gameContractBoDTreasury,
+    contract: contractBoDTreasury,
     method: "function actionsMapping(uint256) returns(string,address,address,bytes,bool,uint256,uint256,uint256,uint256,uint256,uint8,bool)",
     params: [actionTicket],
   });
   const { data: actionTokenNames, actionTokenNamesLoading } = useReadContract({
-    contract: gameContractBoDTreasury,
+    contract: contractBoDTreasury,
     method: "function getActionTokenNames(uint256 _key) public view returns (string[] memory)",
     params: [actionTicket],
   });
 
   const { data: actionTokenAmount, actionTokenAmountLoading } = useReadContract({
-    contract: gameContractBoDTreasury,
+    contract: contractBoDTreasury,
     method: "function getActionAmount(uint256 _key) public view returns (uint256[] memory)",
     params: [actionTicket],
   });
@@ -114,7 +114,7 @@ const BoDBODComponent = () => {
   const { mutate: actionAccept, data: actionAcceptData } = useSendTransaction();
   const ActionAccept = () => {
   const ActionAcceptTransaction = prepareContractCall({
-      contract: gameContractBoDTreasury,
+      contract: contractBoDTreasury,
       method: "function approveAction(uint256 _ActionId)",
       params: [actionTicket],
       })
@@ -123,7 +123,7 @@ const BoDBODComponent = () => {
   const { mutate: denyAction, data: denyActionData } = useSendTransaction();
   const DenyAction = () => {
   const denyActionTransaction = prepareContractCall({
-      contract: gameContractBoDTreasury,
+      contract: contractBoDTreasury,
       method: "function denyAction(uint256 _ActionId)",
       params: [actionTicket],
       })
@@ -132,7 +132,7 @@ const BoDBODComponent = () => {
   const { mutate: executeAction, data: executeActionData } = useSendTransaction();
   const ExecuteActionFun = () => {
   const executeActionTransaction = prepareContractCall({
-      contract: gameContractBoDTreasury,
+      contract: contractBoDTreasury,
       method: "function executeAction(uint _ActionId, bytes calldata _data)",
       params: [actionTicket, "0x"],
       })
@@ -142,7 +142,6 @@ const BoDBODComponent = () => {
 
 
 
-console.log(actionTransaction ? actionTransaction[0] : null)
 
 
 
@@ -307,7 +306,7 @@ const decodeFunctionCall = () => {
 
 
                 <div className="mb-12">
-                  <ul className="my-6 w-full h-full overflow-auto">
+                  <ul className="my-6 w-full h-full overflow-auto flex flex-col gap-1">
                     <li><strong>IPFS Link:</strong></li>
                     <li><IPFSFileViewer ipfsUrl={actionTransaction ? actionTransaction[0] : null} /></li>
                     <li><strong>Submitter:</strong></li>

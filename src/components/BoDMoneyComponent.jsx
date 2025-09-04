@@ -4,7 +4,7 @@ import { useActiveAccount } from "thirdweb/react";
 import { useSendTransaction } from "thirdweb/react";
 import { prepareContractCall } from "thirdweb";
 
-import {gameContractMoneyDAO } from "@/utils/functionDump/getContracts"
+import {contractMoneyDAO } from "@/utils/functionDump/getContracts"
 
 
 
@@ -35,12 +35,12 @@ const BoDMoneyComponent = () => {
 
 
   const { data: amountPerMintMoney, isLoading: amountLoadMoney } = useReadContract({
-    contract: gameContractMoneyDAO,
+    contract: contractMoneyDAO,
     method: "function amountPerMint() returns (uint256)",
   });
 
   const { data: balanceOfMoney, isLoading: sourceLoadMoney } = useReadContract({
-    contract: gameContractMoneyDAO,
+    contract: contractMoneyDAO,
     method: "function balanceOf(address account) returns (uint256)",
     params: [activeAccount ? activeAccount.address : null],
   });
@@ -49,27 +49,27 @@ const BoDMoneyComponent = () => {
   
 
   const { data: capTotalMoney, isLoading: capLoadMoney } = useReadContract({
-    contract: gameContractMoneyDAO,
+    contract: contractMoneyDAO,
     method: "function cap() returns (uint256)",
   });
 
   const { data: lastMintMoney, isLoading: lastMintMoneyLoad } = useReadContract({
-    contract: gameContractMoneyDAO,
+    contract: contractMoneyDAO,
     method: "function lastMinted() returns (uint256)",
   });
 
   const { data: nameMoney, isLoading: nameLoadMoney } = useReadContract({
-    contract: gameContractMoneyDAO,
+    contract: contractMoneyDAO,
     method: "function name() returns (string memory)",
   });
 
   const { data: symbolMoney, isLoading: symbolMoneyLoad } = useReadContract({
-    contract: gameContractMoneyDAO,
+    contract: contractMoneyDAO,
     method: "function symbol() returns (string memory)",
   });
 
   const { data: totalSupplyMoney, isLoading: supplyLoadMoney } = useReadContract({
-    contract: gameContractMoneyDAO,
+    contract: contractMoneyDAO,
     method: "function totalSupply() returns (uint256)",
   });
 
@@ -94,7 +94,7 @@ const BoDMoneyComponent = () => {
       </h3>
       <ul>
         <li>
-          Address: {gameContractMoneyDAO.address}
+          Address: {contractMoneyDAO.address}
         </li>
         <li>
           Name: {nameMoney}

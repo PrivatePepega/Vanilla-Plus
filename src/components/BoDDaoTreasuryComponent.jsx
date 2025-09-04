@@ -5,7 +5,7 @@ import { useSendTransaction } from "thirdweb/react";
 import { prepareContractCall } from "thirdweb";
 import { useState } from "react";
 
-import {gameContractGovernorTreasury } from "@/utils/functionDump/getContracts"
+import {contractGovernorTreasury, contractSourceDAO, contractMoneyDAO } from "@/utils/functionDump/getContracts"
 
 import { Button, Input } from "@material-tailwind/react";
 
@@ -34,7 +34,7 @@ const BoDDaoTreasuryComponent = () => {
 
 
     const { data: showGovernorTreasuryArray, isLoading: GovernorTreasuryLoad } = useReadContract({
-      contract: gameContractGovernorTreasury,
+      contract: contractGovernorTreasury,
       method: "function showTreasuryArray() returns(string[] memory)",
     });
   
@@ -43,6 +43,20 @@ const BoDDaoTreasuryComponent = () => {
   
 
   
+  
+      
+      const { data: balanceOfDAOMoney, isLoading: DaoMoneyLoad } = useReadContract({
+        contract: contractMoneyDAO,
+        method: "function balanceOf(address account) returns (uint256)",
+        params: [contractGovernorTreasury.address],
+      });
+
+
+      const { data: balanceOfTreasury, isLoading: balanceOfTreasuryLoad } = useReadContract({
+        contract: contractSourceDAO,
+        method: "function balanceOf(address account) returns (uint256)",
+        params: [contractGovernorTreasury.address],
+      });
 
 
 
@@ -50,22 +64,22 @@ const BoDDaoTreasuryComponent = () => {
       const [token, setToken] = useState("");
 
       const { data: showAmount, isLoading: showAmountLoad } = useReadContract({
-        contract: gameContractGovernorTreasury,
+        contract: contractGovernorTreasury,
         method: "function showTokenAmount(string memory _name) returns (uint256)",
         params: [token ? token : null],
       });
       const { data: showTokenAddress, isLoading: showTokenAddressLoad } = useReadContract({
-        contract: gameContractGovernorTreasury,
+        contract: contractGovernorTreasury,
         method: "function showTokenAddress(string memory _name) returns (address)",
         params: [token ? token : null],
       });
       const { data: showTokenId, isLoading: showTokenIdLoad } = useReadContract({
-        contract: gameContractGovernorTreasury,
+        contract: contractGovernorTreasury,
         method: "function showTokenId(string memory _name) returns (uint256)",
         params: [token ? token : null],
       });
       const { data: showTokenIsERC20, isLoading: showTokenIsERC20Load } = useReadContract({
-        contract: gameContractGovernorTreasury,
+        contract: contractGovernorTreasury,
         method: "function showTokenIsERC20(string memory _name) returns (bool)",
         params: [token ? token : null],
       });
@@ -76,14 +90,12 @@ const BoDDaoTreasuryComponent = () => {
 
 
 
-        const [updateToken, setUpdateToken] = useState("");
         const { mutate: updateFundCheck, data: updateFundCheckDAta } = useSendTransaction();
     
         const updateFundCheckTx = () => {
           const updateFundCheckTrans = prepareContractCall({
-              contract: gameContractGovernorTreasury,
-              method: "function updateFundCheck(string memory _tokenName)",
-              params: [updateToken ? updateToken : null],
+              contract: contractGovernorTreasury,
+              method: "function updateFundCheck()",
             })
             updateFundCheck(updateFundCheckTrans);
           };
@@ -101,7 +113,7 @@ const BoDDaoTreasuryComponent = () => {
       </h3>
       <ul>
         <li>
-          DAO Treasury Address: {gameContractGovernorTreasury.address}
+          DAO Treasury Address: {contractGovernorTreasury.address}
         </li>
         <li>
           Accepted Tokens, DAO Treasury: {showGovernorTreasuryArray ? showGovernorTreasuryArray.join(', ') : null}
@@ -122,7 +134,7 @@ const BoDDaoTreasuryComponent = () => {
           Token Amount: {Number(showAmount)}
         </li>
         <li>
-          Token Addres: {showTokenAddress}
+          Token Address: {showTokenAddress}
         </li>
         <li>
           Token Id: {Number(showTokenId)}
@@ -134,24 +146,14 @@ const BoDDaoTreasuryComponent = () => {
       <h3 className='my-3 font-bold text-lg'>
         Update Treasury
       </h3>
-      <ul>
-        <li>
-        Update Treasury Token Funds:
-        <div className='w-52'>
-            <Input
-              type="text"
-              size="lg"
-              label="Update dis token"
-              color="white"
-              className=" !border-t-blue-gray-200 focus:!border-t-gray-900"
-              onChange={(e) => {setUpdateToken(e.target.value)}}
-            />
-          </div>
-          <Button onClick={() => updateFundCheckTx()}>
-            Update
-          </Button>
-        </li>
-      </ul>
+      <div className='flex flex-col gap-2'>
+        <p>
+          Update Treasury Token Funds:
+        </p>
+        <Button onClick={() => updateFundCheckTx()}>
+          Update
+        </Button>
+      </div>
     </div>
   )
 }

@@ -5,7 +5,7 @@ import { useSendTransaction } from "thirdweb/react";
 import { prepareContractCall } from "thirdweb";
 import { useState, useEffect } from "react";
 
-import { gameContractBoDTreasury } from "@/utils/functionDump/getContracts"
+import {contractSourceDAO, contractMoneyDAO, contractBoDTreasury } from "@/utils/functionDump/getContracts"
 
 import { Button, Input } from "@material-tailwind/react";
 
@@ -34,13 +34,27 @@ const BoDTreasuryComponent = () => {
 // BoD Treasury // BoD Treasury // BoD Treasury
 
 const { data: showTreasuryArray, isLoading: BoDTreasuryLoad } = useReadContract({
-    contract: gameContractBoDTreasury,
+    contract: contractBoDTreasury,
     method: "function showTreasuryArray() returns(string[] memory)",
   });
   
 
   
 
+  
+
+    const { data: balanceOfDAOMoney, isLoading: DaoMoneyLoad } = useReadContract({
+      contract: contractMoneyDAO,
+      method: "function balanceOf(address account) returns (uint256)",
+      params: [contractBoDTreasury.address],
+    });
+
+
+    const { data: balanceOfTreasury, isLoading: balanceOfTreasuryLoad } = useReadContract({
+      contract: contractSourceDAO,
+      method: "function balanceOf(address account) returns (uint256)",
+      params: [contractBoDTreasury.address],
+    });
 
 
 
@@ -48,22 +62,22 @@ const { data: showTreasuryArray, isLoading: BoDTreasuryLoad } = useReadContract(
     const [token, setToken] = useState("");
 
     const { data: showAmount, isLoading: showAmountLoad } = useReadContract({
-      contract: gameContractBoDTreasury,
+      contract: contractBoDTreasury,
       method: "function showTokenAmount(string memory _name) returns (uint256)",
       params: [token ? token : null],
     });
     const { data: showTokenAddress, isLoading: showTokenAddressLoad } = useReadContract({
-      contract: gameContractBoDTreasury,
+      contract: contractBoDTreasury,
       method: "function showTokenAddress(string memory _name) returns (address)",
       params: [token ? token : null],
     });
     const { data: showTokenId, isLoading: showTokenIdLoad } = useReadContract({
-      contract: gameContractBoDTreasury,
+      contract: contractBoDTreasury,
       method: "function showTokenId(string memory _name) returns (uint256)",
       params: [token ? token : null],
     });
     const { data: showTokenIsERC20, isLoading: showTokenIsERC20Load } = useReadContract({
-      contract: gameContractBoDTreasury,
+      contract: contractBoDTreasury,
       method: "function showTokenIsERC20(string memory _name) returns (bool)",
       params: [token ? token : null],
     });
@@ -75,18 +89,15 @@ const { data: showTreasuryArray, isLoading: BoDTreasuryLoad } = useReadContract(
 
 
 
-    const [updateToken, setUpdateToken] = useState("");
     const { mutate: updateFundCheck, data: updateFundCheckDAta } = useSendTransaction();
 
     const updateFundCheckTx = () => {
       const updateFundCheckTrans = prepareContractCall({
-          contract: gameContractBoDTreasury,
-          method: "function updateFundCheck(string memory _tokenName)",
-          params: [updateToken ? updateToken : null],
+          contract: contractBoDTreasury,
+          method: "function updateFundCheck()",
         })
         updateFundCheck(updateFundCheckTrans);
       };
-
 
 
 
@@ -98,7 +109,7 @@ const { data: showTreasuryArray, isLoading: BoDTreasuryLoad } = useReadContract(
       </h3>
       <ul>
         <li>
-          BoD Treasury: {gameContractBoDTreasury.address}
+          BoD Treasury: {contractBoDTreasury.address}
         </li>
         <li>
           Accepted Tokens, BoD Treasury: {showTreasuryArray ? showTreasuryArray.join(', ') : null}
@@ -119,7 +130,7 @@ const { data: showTreasuryArray, isLoading: BoDTreasuryLoad } = useReadContract(
           Token Amount: {Number(showAmount)}
         </li>
         <li>
-          Token Addres: {showTokenAddress}
+          Token Address: {showTokenAddress}
         </li>
         <li>
           Token Id: {Number(showTokenId)}
@@ -131,24 +142,16 @@ const { data: showTreasuryArray, isLoading: BoDTreasuryLoad } = useReadContract(
       <h3 className='my-3 font-bold text-lg'>
         Update Treasury
       </h3>
-      <ul>
-        <li>
-        Update Treasury Token Funds:
-        <div className='w-52'>
-            <Input
-              type="text"
-              size="lg"
-              label="Update dis token"
-                color="white"
-              className=" !border-t-blue-gray-200 focus:!border-t-gray-900"
-              onChange={(e) => {setUpdateToken(e.target.value)}}
-            />
-          </div>
-          <Button onClick={() => updateFundCheckTx()}>
-            Update
-          </Button>
-        </li>
-      </ul>
+      <div className='flex flex-col gap-2'>
+        <p>
+          Update Treasury Token Funds:
+        </p>
+        <Button onClick={() => updateFundCheckTx()}>
+          Update
+        </Button>
+      </div>
+
+
     </div>
   )
 }
