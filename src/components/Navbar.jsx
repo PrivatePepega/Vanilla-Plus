@@ -46,7 +46,9 @@ export default function Navbar () {
           <li>guild</li>
         </Link>
         <Link href="/https://guildbank.biz/user">
-          <li>user</li>
+          <a rel="noopener noreferrer" target="_blank">
+            <li>user</li>
+          </a>
         </Link>
         <li>
           <ConnectButton client={client} chain={chainById} connectButton={{ label: "Login" }}/>
