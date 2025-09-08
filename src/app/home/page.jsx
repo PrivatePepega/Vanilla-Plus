@@ -14,6 +14,7 @@ import LocalBankCard from '@/components/LocalBankCard'; // Adjust the path as ne
 
 // Contracts
 import { useActiveAccount } from "thirdweb/react";
+import Socials from '@/components/Socials';
 
 
 const page = () => {
@@ -45,6 +46,7 @@ const page = () => {
         <div>
           <InformationGallery />
         </div>
+        <Socials/>
       </div>  
       )
   }
