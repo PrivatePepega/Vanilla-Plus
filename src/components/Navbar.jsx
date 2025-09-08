@@ -33,11 +33,9 @@ export default function Navbar () {
       </Link>
       {/* <NavbarCollapse /> */}
       <ul className="flex flex-row w-full justify-end gap-8 items-center">
-        <Link href="https://www.tally.xyz/">
-          <a rel="noopener noreferrer" target="_blank">
+          <a  href="https://www.tally.xyz/" rel="noopener noreferrer" target="_blank">
             <li>Tally</li>
           </a>
-        </Link>
         <Link href="/mint">
           <li>mint</li>
         </Link>
@@ -47,11 +45,9 @@ export default function Navbar () {
         <Link href="/guild">
           <li>guild</li>
         </Link>
-        <Link href="/https://guildbank.biz/user">
-          <a rel="noopener noreferrer" target="_blank">
+          <a href="https://guildbank.biz/user" rel="noopener noreferrer" target="_blank">
             <li>user</li>
           </a>
-        </Link>
         <li>
           <ConnectButton client={client} chain={chainById} connectButton={{ label: "Login" }}/>
         </li>
