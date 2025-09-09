@@ -8,7 +8,7 @@
 
 import { useReadContract } from "thirdweb/react";
 import { useActiveAccount } from "thirdweb/react";
-import { gameContractSourceDAO, gameContractMoneyDAO } from "@/utils/functionDump/getContracts"
+import { contractSourceDAO, contractMoneyDAO } from "@/utils/functionDump/getContracts"
 import { useSendTransaction } from "thirdweb/react";
 
 import { prepareContractCall } from "thirdweb";
@@ -36,14 +36,14 @@ const Mint = () => {
     const { mutate: DAONoMint, isPending: DAONoMintpending } = useSendTransaction();
     const handleDAONoMint = async () => {
       const punishDAOTX = prepareContractCall({
-        contract: gameContractSourceDAO,
+        contract: contractSourceDAO,
         method: "function NoMintPunishment()",
       });
       DAONoMint(punishDAOTX);
     };
     
     const { data: daoAmount, isLoading: daoAmountLoading } = useReadContract({
-      contract: gameContractSourceDAO,
+      contract: contractSourceDAO,
       method: "function amountPerMint() returns (uint256)",
     });
 
@@ -59,14 +59,14 @@ const Mint = () => {
     const { mutate: MoneyNoMint, isPending: MoneyNoMintpending } = useSendTransaction();
     const handleMoneyNoMint = async () => {
       const punishMoneyTX = prepareContractCall({
-        contract: gameContractMoneyDAO,
+        contract: contractMoneyDAO,
         method: "function NoMintPunishment()",
       });
       MoneyNoMint(punishMoneyTX);
     };
 
     const { data: moneyAmount, isLoading: moneyAmountLoading } = useReadContract({
-      contract: gameContractMoneyDAO,
+      contract: contractMoneyDAO,
       method: "function amountPerMint() returns (uint256)",
     });
 
