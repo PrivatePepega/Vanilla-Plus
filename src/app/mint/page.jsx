@@ -87,7 +87,7 @@ const Mint = () => {
       <div className="flex flex-row gap-8">
 
         <div className="flex flex-col justify-center items-center">
-          <h2>source: ({Number(daoAmount)})</h2>
+          <h2>dao reward amount: ({Number(daoAmount)})</h2>
           <ButtonGroup>
             <Button onClick={()=> {handleDAONoMint()}}>punish</Button>
           </ButtonGroup>
@@ -95,7 +95,7 @@ const Mint = () => {
 
 
         <div className="flex flex-col justify-center items-center">
-          <h2>money: ({Number(moneyAmount)})</h2>
+          <h2>money reward amount: ({Number(moneyAmount)})</h2>
           <ButtonGroup>
             <Button onClick={()=> {handleMoneyNoMint()}}>punish</Button>
           </ButtonGroup>
@@ -113,7 +113,9 @@ const Mint = () => {
         <h2>
           and download the latest version of the app for your OS.
         </h2>
-        <Link href="https://github.com/source-dao/source-dao-app/releases">Github Link</Link>
+          <a  href="https://github.com/PrivatePepega/GuildBank-App" rel="noopener noreferrer" target="_blank">
+            Github Link
+          </a>
       </div>
 
       <WoWUpload/>
