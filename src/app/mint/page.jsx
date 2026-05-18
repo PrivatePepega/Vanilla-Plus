@@ -116,6 +116,7 @@ const Mint = () => {
           <a  href="https://github.com/PrivatePepega/GuildBank-App" rel="noopener noreferrer" target="_blank">
             Github Link
           </a>
+          <h2>Read the github docs underneath for a better explanation</h2>
       </div>
 
       <WoWUpload/>
