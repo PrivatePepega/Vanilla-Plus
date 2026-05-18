@@ -13,6 +13,8 @@ import BoDVotingCCO from "./BoDVotingCCO";
 import BoDVotingCFO from "./BoDVotingCFO";
 import BoDVotingCTO from "./BoDVotingCTO";
 import BoDVotingCEO from "./BoDVotingCEO";
+import {LocalBankGovernorElectionAddress} from "../utils/contractAddressHardhat.js"
+import {LocalBankGovernorBallotAddress} from "../utils/contractAddressHardhat.js"
 
 
 
@@ -213,9 +215,12 @@ const BoDElectionComponent = () => {
 
 
         <div className="flex flex-col justify-center items-center">
-            <h2 className='font-bold text-lg my-5'>
+            <h2 className='font-bold text-lg mt-5'>
                 Elections
             </h2>
+            <p>Election Address: {LocalBankGovernorElectionAddress}</p>
+            <p className="mb-5">Ballot Address: {LocalBankGovernorBallotAddress}</p>
+
             <ButtonGroup>
                 <div>
                     <Button onClick={()=>{startElectionTx()}}>Start Election</Button>

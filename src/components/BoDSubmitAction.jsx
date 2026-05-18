@@ -13,6 +13,7 @@ import { useSendTransaction } from "thirdweb/react";
 import { prepareContractCall } from "thirdweb";
 import {uploadData} from "@/utils/functionDump/Passport.js"
 import IPFSFileViewer from "./IPFSFileViewer";
+import {LocalBankBoDTreasuryAddress} from "../utils/contractAddressHardhat.js"
 
 
 
@@ -228,10 +229,11 @@ const encodeFunctionCall = () => {
     return (
 
     <div>
-        <div className="flex justify-center items-center">
-            <h3 className='my-3 font-bold text-lg'>
+        <div className="flex justify-center items-center my-3">
+            <h3 className=' font-bold text-lg'>
                 Proposal
             </h3>
+            <p>BoD Treasury Contract: {LocalBankBoDTreasuryAddress}</p>
         </div>
 
 

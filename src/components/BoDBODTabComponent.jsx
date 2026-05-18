@@ -17,6 +17,7 @@ import { useSendTransaction } from "thirdweb/react";
 import { prepareContractCall } from "thirdweb";
 
 import IPFSFileViewer from "./IPFSFileViewer";
+import {LocalBankBoDAddress} from "../utils/contractAddressHardhat.js"
 
 
 
@@ -362,8 +363,11 @@ return (
     <div>
         <div className="flex justify-center items-center">
             <h3 className='font-bold text-lg my-5'>
-            Board of Directors Chair Holders
+                Board of Directors Chair Holders
             </h3>
+            <p>
+                BoD Address: {LocalBankBoDAddress}
+            </p>
         </div>
         Your Voting Power: {Number(showUserVotingUnits)}
         <ul className="flex flex-col gap-14">

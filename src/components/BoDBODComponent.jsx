@@ -16,6 +16,7 @@ import BoDSubmitAction from "./BoDSubmitAction";
 import BoDBODTabComponent from "./BoDBODTabComponent";
 
 import IPFSFileViewer from "@/components/IPFSFileViewer";
+import {LocalBankBoDTreasuryAddress} from "../utils/contractAddressHardhat.js"
 
 
 
@@ -249,10 +250,11 @@ const decodeFunctionCall = () => {
 
     return (
     <div>
-      <div className="flex justify-center items-center">
-        <h3 className='font-bold text-lg my-5'>
+      <div className="flex justify-center items-center my-5">
+        <h3 className='font-bold text-lg'>
           BoD, Board of Directors
         </h3>
+        <p>BoD Treasury Contract: {LocalBankBoDTreasuryAddress}</p>
       </div>
         <div className="flex flex-row gap-12 justify-center items-center">
           <ButtonGroup>
