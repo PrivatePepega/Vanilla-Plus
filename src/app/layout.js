@@ -21,7 +21,7 @@ export const metadata = {
     "Vanilla-Plus",
   ],
   author: [{ name: "GuildBank Team"}],
-  creator: "Vanilla-Plus",
+  creator: "GuildBank",
   openGraph: {
     title: "Vanilla-Plus",
     description: "Together. Building and owning the metaverse.",
