@@ -16,7 +16,30 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata = {
   title: "Vanilla-Plus",
   description: "Together. Building and owning the metaverse.",
+  keywords: [
+    "GuildBank",
+    "Vanilla-Plus",
+  ],
+  author: [{ name: "GuildBank Team"}],
+  creator: "Vanilla-Plus",
+  openGraph: {
+    title: "Vanilla-Plus",
+    description: "Together. Building and owning the metaverse.",
+    url: "https://Vanilla-Plus.com",           // ← Change to your real domain
+    siteName: "Vanilla-Plus",
+    images: [
+      {
+        url: "/og-image.jpg",               // Recommended size: 1200x630
+        width: 1200,
+        height: 630,
+        alt: "GuildBank Metaverse",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
 };
+
 
 
 
