@@ -167,10 +167,16 @@ console.log("say accountName:", accountName);
 
 
     // Validate inputs
+    console.log("checking app secret")
     if (secret !== APP_SECRET) return NextResponse.json({ error: 'Invalid app secret' }, { status: 401 });
+    console.log("app secret ready")
+    console.log("checking game name")
     if (game !== gameName || type !== signedType) return NextResponse.json({ error: 'Mismatched game or type' }, { status: 400 });
     if (game !== 'vanilla-plus') return NextResponse.json({ error: 'Invalid game' }, { status: 400 });
+    console.log("game name ready")
+    console.log("checking mint type")
     if (!['daily', 'weekly'].includes(type)) return NextResponse.json({ error: 'Invalid type' }, { status: 400 });
+    console.log("mint type ready")
 
     // Verify blockchain password
     try {
@@ -184,12 +190,24 @@ console.log("say accountName:", accountName);
 
       // const userPasswordHash = crypto.createHash('sha256').update(userPassword).digest('hex');
       if (blockchainPasswordHash !== userPassword) {
+        console.log('Blockchain auth failed')
         return NextResponse.json({ error: 'Blockchain auth failed' }, { status: 401 });
       }
     } catch (err) {
       console.error('Thirdweb blockchain error:', { error: err.message });
       return NextResponse.json({ error: 'Blockchain verification failed' }, { status: 500 });
     }
+      console.log("blockchain user's password ready")
+
+
+
+
+
+
+
+
+
+
 
 
     
@@ -262,5 +280,7 @@ console.log("say accountName:", accountName);
     console.error('Auth ping error:', { error: err.message });
     return NextResponse.json({ error: 'Server error' }, { status: 500 });
   }
+
+
 }
 
