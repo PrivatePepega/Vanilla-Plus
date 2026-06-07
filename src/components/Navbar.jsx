@@ -4,7 +4,7 @@
 
 import Image from "next/image";
 // import NavbarCollapse from "./NavbarCollapse";
-import GNaUnkea4AAivb7 from "@/assets/img/Vanilla-Plus helvetica r.png";
+import GNaUnkea4AAivb7 from "@/assets/img/vanilla-plus logo-01.png";
 import Link from "next/link";
 
 
