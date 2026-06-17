@@ -1,19 +1,16 @@
 // 🧱 Updated contract addresses for Hardhat deployment
 
-export const LocalBankSourceAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
-export const LocalBankMoneyAddress = "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512";
-export const GuildBankPassportAddress = "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0";
-export const GuildBankPassportFollowListAddress = "0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9";
-export const GuildBankPassportFrenListAddress = "0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9";
-export const LocalBankTimeLockAddress = "0x5FC8d32690cc91D4c39d9d3abcBD16989F875707";
-export const LocalBankGovernorAddress = "0x0165878A594ca255338adfa4d48449f69242Eb8F";
-export const LocalBankGovernorElectionAddress = "0xa513E6E4b8f2a923D98304ec87F64353C4D5C853";
-export const LocalBankGovernorBallotAddress = "0x2279B7A0a67DB372996a5FaB50D91eAA73d2eBe6";
-export const LocalBankBoDAddress = "0x8A791620dd6260079BF849Dc5567aDC3F2FdC318";
-export const LocalBankBoDTreasuryAddress = "0x610178dA211FEF7D417bC0e6FeD39F05609AD788";
-export const LocalBankGovernorTreasuryAddress = "0xB7f8BC63BbcaD18155201308C8f3540b07f84F5e";
-export const LocalBankDAOBurner = "0xA51c1fc2f0D1a1b8494Ed1FE312d7C3a78Ed91C0";
-export const LocalBankAccessManagerAddress = "0x0DCd1Bf9A1b36cE34237eEaFef220932846BCD82";
+export const LocalBankSourceAddress = "0xa81725c2B46Eea69f619718b47bE5E15c3d57a6F";
+export const LocalBankMoneyAddress = "0x798E1F5Bbd5BC55c34fCCf8aE00350196aefebAe";
+export const GuildBankPassportAddress = "0x83F14DBcFA7C6E6DedF752dae586CDc60a1a2178";
+export const LocalBankTimeLockAddress = "0x5c564c2ca4bDd6167bDc5f2EfEe8A72531ae82E7";
+export const LocalBankGovernorAddress = "0x7B317AE30d1176EA88DfBF90d73b3Fe4F0997570";
+export const LocalBankGovernorElectionAddress = "0xD368b6a0B1a133b9A25D19c48579235056678ce6";
+export const LocalBankGovernorBallotAddress = "0xA130fb699BB3a141Ef9E24E3915Ba16Cd20b35d3";
+export const LocalBankBoDAddress = "0x1671F14dc64Fc173A4Fe3eCAdC236E75F7c0F9d2";
+export const LocalBankBoDTreasuryAddress = "0xA38a11a273310477Cf524E22F7B23D9fE1B18e89";
+export const LocalBankGovernorTreasuryAddress = "0x17b2d8259df3FfC41bC4b33756b9bF817f298Dbc";
+export const LocalBankAccessManagerAddress = "0x0665575861471FAA4a2C589af8023ca768f63097";
 
 export const contractAddresses = {
   Source: LocalBankSourceAddress,
@@ -21,14 +18,11 @@ export const contractAddresses = {
   TimeLock: LocalBankTimeLockAddress,
   Governor: LocalBankGovernorAddress,
   Passport: GuildBankPassportAddress,
-  PassportFollowList: GuildBankPassportFollowListAddress,
-  PassportFrenList: GuildBankPassportFrenListAddress,
   BoD: LocalBankBoDAddress,
   GovernorElection: LocalBankGovernorElectionAddress,
   BoDTreasury: LocalBankBoDTreasuryAddress,
   GovernorTreasury: LocalBankGovernorTreasuryAddress,
   AccessManager: LocalBankAccessManagerAddress,
-  Burner: LocalBankDAOBurner,
   Ballot: LocalBankGovernorBallotAddress,
 };
 
