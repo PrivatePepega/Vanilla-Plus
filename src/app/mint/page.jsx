@@ -107,16 +107,10 @@ const Mint = () => {
 
 
       <div className="flex flex-col justify-center items-center my-6">
-        <h2>
-          Go to our github, on the right side of the page click on releases,
-        </h2>
-        <h2>
-          and download the latest version of the app for your OS.
-        </h2>
-          <a  href="https://github.com/PrivatePepega/GuildBank-App" rel="noopener noreferrer" target="_blank">
-            Github Link
-          </a>
-          <h2>Read the github docs underneath for a better explanation</h2>
+        <a  href="https://github.com/PrivatePepega/GuildBank-App" rel="noopener noreferrer" target="_blank">
+          Github Link
+        </a>
+        <h2>Read the github docs underneath for a better explanation</h2>
       </div>
 
       <WoWUpload/>
