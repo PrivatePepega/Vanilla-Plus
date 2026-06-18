@@ -1,16 +1,16 @@
 // 🧱 Updated contract addresses for Hardhat deployment
 
-export const LocalBankSourceAddress = "0xa2DdE248Bd5fA49bB418b634e1D1249047D4D446";
-export const LocalBankMoneyAddress = "0x96Ddee01fEFe38D86adCdFbEBC1D36f77D7048Cf";
-export const GuildBankPassportAddress = "0xc36861A4396Ed8406Ec45B412C1bfA71d54B5a07";
-export const LocalBankTimeLockAddress = "0x331611af6574d96E35bC8D74568b14bd44c34fC2";
-export const LocalBankGovernorAddress = "0xc7aDa08DF7c1A8Ed3f1A5651739f9127A2848344";
-export const LocalBankGovernorElectionAddress = "0x91E47F5C0d11F85532c1A42b937a83cAE202D223";
-export const LocalBankGovernorBallotAddress = "0x3B1b5Ae7795599b5191afC381e5375D5b2135FC7";
-export const LocalBankBoDAddress = "0xE3F50D77D4B4857A6A3D86a3fcd030f28b630929";
-export const LocalBankBoDTreasuryAddress = "0xFf95aC896b75BAF36150FF49b24B31627d6FbD69";
-export const LocalBankGovernorTreasuryAddress = "0xF968010dFe9A28c5e959d665E42Ec22BEb3a006e";
-export const LocalBankAccessManagerAddress = "0x71DE665937f509a200E2C8F39c0c6F3f5BD0684E";
+export const LocalBankSourceAddress = "0x3b4e374507cF09D7c8C709ED8c63f0b74002b9f5";
+export const LocalBankMoneyAddress = "0x33C669eC8BD01d153E14001bC3610f38cf83f100";
+export const GuildBankPassportAddress = "0x1B621FaA831d9ec331514635056C70bc388e028b";
+export const LocalBankTimeLockAddress = "0xD558da65639b000005890B3e1547Efa511A05a5b";
+export const LocalBankGovernorAddress = "0x84D1f9d216784e1c7229F437E92e0d15f006e388";
+export const LocalBankGovernorElectionAddress = "0x61D9339A7d6d96CFFF6c91CD06E61619AC5FCb2f";
+export const LocalBankGovernorBallotAddress = "0xd2F263b3d90916B26C46DEf427A3f60aa0Cab5bD";
+export const LocalBankBoDAddress = "0x0474D51C4a817422104cB574a148a05429CAccC8";
+export const LocalBankBoDTreasuryAddress = "0x25d1ef075A6C0a3b36765dB2bc4473B86B834321";
+export const LocalBankGovernorTreasuryAddress = "0x9Dc18874Ade0c337E6b48BEfFb183AC59adB3221";
+export const LocalBankAccessManagerAddress = "0x22F6388F5C9C64224184882921847e10414c3bf8";
 
 
 export const contractAddresses = {
