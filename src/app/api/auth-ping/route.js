@@ -10,21 +10,9 @@ import { contractPassport } from "@/utils/functionDump/getContracts"
 
 
 
-const secretsManager = new SecretsManagerClient({
-  region: 'us-east-1',
-});
 
 
 
-// Validate environment variables
-if (!process.env.NEXT_PUBLIC_THIRDWEB_CLIENT_ID) {
-  console.error('Missing NEXT_PUBLIC_THIRDWEB_CLIENT_ID in environment variables');
-  throw new Error('Thirdweb configuration error');
-}
-if (!chainById) {
-  console.error('Invalid chainById configuration');
-  throw new Error('Thirdweb chain configuration error');
-}
 
 
 
@@ -99,9 +87,21 @@ EQIDAQAB
 
 
 
+const secretsManager = new SecretsManagerClient({
+  region: 'us-east-1',
+  credentials: {
+    accessKeyId: process.env.GB_ACCESS_KEY_ID,
+    secretAccessKey: process.env.GB_SECRET_ACCESS_KEY,
+  },
+});
+
+
+
+
+
 async function getSecrets() {
   try {
-    const command = new GetSecretValueCommand({ SecretId: process.env.SECRET_ID });
+    const command = new GetSecretValueCommand({ SecretId: process.env.GB_SECRET_ID });
     const data = await secretsManager.send(command);
     if ('SecretString' in data) return JSON.parse(data.SecretString);
     throw new Error('Secrets not found');

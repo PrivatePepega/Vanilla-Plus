@@ -6,9 +6,7 @@ import { prepareContractCall, sendTransaction } from 'thirdweb';
 import { gameContractMoneyDAO, gameContractSourceDAO } from '@/utils/functionDump/getContracts';
 import { privateKeyToAccount } from 'thirdweb/wallets';
 
-const secretsManager = new SecretsManagerClient({
-  region: 'us-east-1',
-});
+
 
 
 
@@ -17,9 +15,17 @@ export async function POST(req) {
     console.log('Received POST request to /api/verify-files');
 
 
+    const secretsManager = new SecretsManagerClient({
+      region: 'us-east-1',
+      credentials: {
+        accessKeyId: process.env.GB_ACCESS_KEY_ID,
+        secretAccessKey: process.env.GB_SECRET_ACCESS_KEY,
+      },
+    });
+    
     async function getSecrets() {
       try {
-        const command = new GetSecretValueCommand({ SecretId: process.env.SECRET_ID });
+        const command = new GetSecretValueCommand({ SecretId: process.env.GB_SECRET_ID });
         const data = await secretsManager.send(command);
         if ('SecretString' in data) return JSON.parse(data.SecretString);
         throw new Error('Secrets not found');
@@ -28,6 +34,8 @@ export async function POST(req) {
         throw err;
       }
     }
+
+
 
 
     // Parse form data
@@ -92,7 +100,7 @@ export async function POST(req) {
     // Initialize server wallet
     console.log('Initializing server wallet');
     const serverAccount = privateKeyToAccount({
-      client: { clientId: process.env.THIRDWEB_CLIENT_ID },
+      client: { clientId: process.env.NEXT_PUBLIC_THIRDWEB_CLIENT_ID },
       privateKey: SERVER_WALLET_PASSWORD,
     });
     console.log('Server wallet initialized:', serverAccount);
