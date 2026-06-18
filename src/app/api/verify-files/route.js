@@ -340,6 +340,6 @@ export async function POST(req) {
  return NextResponse.json({ success: true, dailyCount, weeklyCount }, { status: 200 });
 } catch (err) {
  console.error('File upload error:', err);
- return NextResponse.json({ error: 'Server error' }, { status: 500 });
+ return NextResponse.json({ error: 'Server error', details: err.message }, { status: 500 });
 }
 }
