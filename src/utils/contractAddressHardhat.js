@@ -1,16 +1,17 @@
 // 🧱 Updated contract addresses for Hardhat deployment
 
-export const LocalBankSourceAddress = "0xa81725c2B46Eea69f619718b47bE5E15c3d57a6F";
-export const LocalBankMoneyAddress = "0x798E1F5Bbd5BC55c34fCCf8aE00350196aefebAe";
-export const GuildBankPassportAddress = "0x83F14DBcFA7C6E6DedF752dae586CDc60a1a2178";
-export const LocalBankTimeLockAddress = "0x5c564c2ca4bDd6167bDc5f2EfEe8A72531ae82E7";
-export const LocalBankGovernorAddress = "0x7B317AE30d1176EA88DfBF90d73b3Fe4F0997570";
-export const LocalBankGovernorElectionAddress = "0xD368b6a0B1a133b9A25D19c48579235056678ce6";
-export const LocalBankGovernorBallotAddress = "0xA130fb699BB3a141Ef9E24E3915Ba16Cd20b35d3";
-export const LocalBankBoDAddress = "0x1671F14dc64Fc173A4Fe3eCAdC236E75F7c0F9d2";
-export const LocalBankBoDTreasuryAddress = "0xA38a11a273310477Cf524E22F7B23D9fE1B18e89";
-export const LocalBankGovernorTreasuryAddress = "0x17b2d8259df3FfC41bC4b33756b9bF817f298Dbc";
-export const LocalBankAccessManagerAddress = "0x0665575861471FAA4a2C589af8023ca768f63097";
+export const LocalBankSourceAddress = "0xa2DdE248Bd5fA49bB418b634e1D1249047D4D446";
+export const LocalBankMoneyAddress = "0x96Ddee01fEFe38D86adCdFbEBC1D36f77D7048Cf";
+export const GuildBankPassportAddress = "0xc36861A4396Ed8406Ec45B412C1bfA71d54B5a07";
+export const LocalBankTimeLockAddress = "0x331611af6574d96E35bC8D74568b14bd44c34fC2";
+export const LocalBankGovernorAddress = "0xc7aDa08DF7c1A8Ed3f1A5651739f9127A2848344";
+export const LocalBankGovernorElectionAddress = "0x91E47F5C0d11F85532c1A42b937a83cAE202D223";
+export const LocalBankGovernorBallotAddress = "0x3B1b5Ae7795599b5191afC381e5375D5b2135FC7";
+export const LocalBankBoDAddress = "0xE3F50D77D4B4857A6A3D86a3fcd030f28b630929";
+export const LocalBankBoDTreasuryAddress = "0xFf95aC896b75BAF36150FF49b24B31627d6FbD69";
+export const LocalBankGovernorTreasuryAddress = "0xF968010dFe9A28c5e959d665E42Ec22BEb3a006e";
+export const LocalBankAccessManagerAddress = "0x71DE665937f509a200E2C8F39c0c6F3f5BD0684E";
+
 
 export const contractAddresses = {
   Source: LocalBankSourceAddress,

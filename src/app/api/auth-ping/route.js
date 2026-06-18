@@ -75,15 +75,7 @@ function formatPemKey(key) {
 
 
 export async function POST(request) {
-  const serverPublicKey = `-----BEGIN PUBLIC KEY-----
-MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA6lf5oWbDy1X0Cgq2ExZI
-DV+6PDoTZit0DpGcswwcTuhWhDacg3aAhcuDW7aWo5cETMhhJGwxueixRg1C8nvr
-dHalIE8S3rXrHiEh2AQX91w6Yg1SemUA6ves+2Tw9Ir1pKjFTsghjMGT1bIBe674
-u8h1AUf7hSTh1AHeiWfxY6SxCx6na50ZC5Ye0ryIHajukLd4e5Y08Lyza074Ijsj
-yRiIvZ1QXHhANqI7diFKP4s1zblYVqc9EFbb3g2zw8fGdCz7E0Ax5pR5lFSVCS55
-J3KZA4whyoSYdclDJ6QWkFUO4ZeDetqdT2FQAyHGQPFeiCRxYhE/FeK/aH2ZAyKP
-EQIDAQAB
------END PUBLIC KEY-----`;
+
 
 
 
@@ -161,7 +153,6 @@ async function getSecrets() {
 
     const [fileHash, gameName, secret, userPassword, signedType, timeField, accountName] = decrypted;
 
-console.log("say accountName:", accountName);
 
 
     // Validate inputs
@@ -189,7 +180,7 @@ console.log("say accountName:", accountName);
       // const userPasswordHash = crypto.createHash('sha256').update(userPassword).digest('hex');
       if (blockchainPasswordHash !== userPassword) {
         console.log('Blockchain auth failed')
-        return NextResponse.json({ error: 'Blockchain auth failed' }, { status: 401 });
+        return NextResponse.json({ error: 'Blockchain password auth failed' }, { status: 401 });
       }
     } catch (err) {
       console.error('Thirdweb blockchain error:', { error: err.message });
