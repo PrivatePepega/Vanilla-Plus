@@ -7,28 +7,28 @@ import { gameContractMoneyDAO, gameContractSourceDAO } from '@/utils/functionDum
 import { privateKeyToAccount } from 'thirdweb/wallets';
 
 const secretsManager = new SecretsManagerClient({
-  region: process.env.AWS_REGION,
-  credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-  },
+  region: 'us-east-1',
 });
 
-async function getSecrets() {
-  try {
-    const command = new GetSecretValueCommand({ SecretId: process.env.AWS_SECRET_ID });
-    const data = await secretsManager.send(command);
-    if ('SecretString' in data) return JSON.parse(data.SecretString);
-    throw new Error('Secrets not found');
-  } catch (err) {
-    console.error('SecretsManager error:', { error: err.message });
-    throw err;
-  }
-}
+
 
 export async function POST(req) {
   try {
     console.log('Received POST request to /api/verify-files');
+
+
+    async function getSecrets() {
+      try {
+        const command = new GetSecretValueCommand({ SecretId: process.env.SECRET_ID });
+        const data = await secretsManager.send(command);
+        if ('SecretString' in data) return JSON.parse(data.SecretString);
+        throw new Error('Secrets not found');
+      } catch (err) {
+        console.error('SecretsManager error:', { error: err.message });
+        throw err;
+      }
+    }
+
 
     // Parse form data
     console.log('Parsing form data');

@@ -11,24 +11,10 @@ import { contractPassport } from "@/utils/functionDump/getContracts"
 
 
 const secretsManager = new SecretsManagerClient({
-  region: process.env.AWS_REGION,
-  credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-  },
+  region: 'us-east-1',
 });
 
-async function getSecrets() {
-  try {
-    const command = new GetSecretValueCommand({ SecretId: process.env.AWS_SECRET_ID });
-    const data = await secretsManager.send(command);
-    if ('SecretString' in data) return JSON.parse(data.SecretString);
-    throw new Error('Secrets not found');
-  } catch (err) {
-    console.error('SecretsManager error:', { error: err.message });
-    throw err;
-  }
-}
+
 
 // Validate environment variables
 if (!process.env.NEXT_PUBLIC_THIRDWEB_CLIENT_ID) {
@@ -112,6 +98,18 @@ EQIDAQAB
 -----END PUBLIC KEY-----`;
 
 
+
+async function getSecrets() {
+  try {
+    const command = new GetSecretValueCommand({ SecretId: process.env.SECRET_ID });
+    const data = await secretsManager.send(command);
+    if ('SecretString' in data) return JSON.parse(data.SecretString);
+    throw new Error('Secrets not found');
+  } catch (err) {
+    console.error('SecretsManager error:', { error: err.message });
+    throw err;
+  }
+}
 
 
   try {
