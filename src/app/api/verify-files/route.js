@@ -6,14 +6,9 @@ import { prepareContractCall, sendTransaction } from 'thirdweb';
 import { gameContractMoneyDAO, gameContractSourceDAO } from '@/utils/functionDump/getContracts';
 import { privateKeyToAccount } from 'thirdweb/wallets';
 
-
-
-
-
 export async function POST(req) {
   try {
     console.log('Received POST request to /api/verify-files');
-
 
     const secretsManager = new SecretsManagerClient({
       region: 'us-east-1',
@@ -22,7 +17,7 @@ export async function POST(req) {
         secretAccessKey: process.env.GB_SECRET_ACCESS_KEY,
       },
     });
-    
+
     async function getSecrets() {
       try {
         const command = new GetSecretValueCommand({ SecretId: process.env.GB_SECRET_ID });
@@ -34,9 +29,6 @@ export async function POST(req) {
         throw err;
       }
     }
-
-
-
 
     // Parse form data
     console.log('Parsing form data');
@@ -103,17 +95,9 @@ export async function POST(req) {
       client: { clientId: process.env.NEXT_PUBLIC_THIRDWEB_CLIENT_ID },
       privateKey: SERVER_WALLET_PASSWORD,
     });
-    console.log('Server wallet initialized:', serverAccount);
+    console.log('Server wallet initialized:', serverAccount?.address);
 
-
-
-
-
-
-
-
-    // NEW: Upsert accounts for each unique accountName
-    // Extracts unique accountNames from daily and weekly files, ensures they exist in accounts table
+    // Upsert accounts for each unique accountName
     const accountNames = [
       ...new Set([
         ...jsonData.dailyFiles.map((item) => item.daily?.accountName).filter(Boolean),
@@ -144,202 +128,192 @@ export async function POST(req) {
       }
     }
 
+    // Generate hashes and collect unminted IDs — DO NOT mark minted yet
+    let dailyToMint = []; // { id, fileHash, date, accountName } for existing unminted rows
+    let dailyToInsert = []; // new rows to insert after mint
+    let weeklyToMint = []; // { id, fileHash, week, accountName } for existing unminted rows
+    let weeklyToInsert = []; // new rows to insert after mint
 
+    console.log('Hashing daily items from dailyFiles');
+    for (const item of jsonData.dailyFiles) {
+      if (!item.daily || !item.daily.accountName || !item.daily.date || !item.daily.wallet) {
+        console.warn('Skipping invalid daily item:', item);
+        continue;
+      }
+      if (item.daily.wallet !== wallet) {
+        console.warn('Wallet mismatch in daily item:', item.daily.wallet, wallet);
+        continue;
+      }
+      const fileHash = crypto.createHash('sha256').update(JSON.stringify(item.daily)).digest('hex');
+      const { date, accountName } = item.daily;
+      console.log('Generated daily hash:', fileHash, 'date:', date, 'accountName:', accountName);
 
+      const { data: existingHash, error } = await supabase
+        .from('file_hashes')
+        .select('id, minted')
+        .eq('account_name', accountName)
+        .eq('file_hash', fileHash)
+        .eq('type', 'daily')
+        .eq('date', date)
+        .eq('wallet', wallet)
+        .single();
 
+      if (error && error.code !== 'PGRST116') {
+        console.error('Supabase query error (daily):', error);
+        continue;
+      }
 
+      if (existingHash) {
+        if (!existingHash.minted) {
+          console.log('Found unminted daily hash, queuing for mint:', existingHash.id);
+          dailyToMint.push({ id: existingHash.id, fileHash, date, accountName });
+        } else {
+          console.log('Daily hash already minted, skipping:', fileHash);
+        }
+      } else {
+        console.log('New daily hash, queuing for insert after mint:', fileHash);
+        dailyToInsert.push({ fileHash, date, accountName });
+      }
+    }
 
+    console.log('Hashing weekly items from weeklyFiles');
+    for (const item of jsonData.weeklyFiles) {
+      if (!item.weekly || !item.weekly.accountName || !item.weekly.week || !item.weekly.wallet) {
+        console.warn('Skipping invalid weekly item:', item);
+        continue;
+      }
+      if (item.weekly.wallet !== wallet) {
+        console.warn('Wallet mismatch in weekly item:', item.weekly.wallet, wallet);
+        continue;
+      }
+      const fileHash = crypto.createHash('sha256').update(JSON.stringify(item.weekly)).digest('hex');
+      const { week, accountName } = item.weekly;
+      console.log('Generated weekly hash:', fileHash, 'week:', week, 'accountName:', accountName);
 
+      const { data: existingHash, error } = await supabase
+        .from('file_hashes')
+        .select('id, minted')
+        .eq('account_name', accountName)
+        .eq('file_hash', fileHash)
+        .eq('type', 'weekly')
+        .eq('week', week)
+        .eq('wallet', wallet)
+        .single();
 
+      if (error && error.code !== 'PGRST116') {
+        console.error('Supabase query error (weekly):', error);
+        continue;
+      }
 
+      if (existingHash) {
+        if (!existingHash.minted) {
+          console.log('Found unminted weekly hash, queuing for mint:', existingHash.id);
+          weeklyToMint.push({ id: existingHash.id, fileHash, week, accountName });
+        } else {
+          console.log('Weekly hash already minted, skipping:', fileHash);
+        }
+      } else {
+        console.log('New weekly hash, queuing for insert after mint:', fileHash);
+        weeklyToInsert.push({ fileHash, week, accountName });
+      }
+    }
 
+    const dailyCount = dailyToMint.length + dailyToInsert.length;
+    const weeklyCount = weeklyToMint.length + weeklyToInsert.length;
+    console.log('Daily to mint:', dailyCount, 'Weekly to mint:', weeklyCount);
 
+    // Mint MoneyDAO tokens for daily — THEN mark in Supabase
+    if (dailyCount > 0) {
+      console.log('Preparing to mint MoneyDAO tokens:', dailyCount);
+      const transaction = prepareContractCall({
+        contract: gameContractMoneyDAO,
+        method: 'function Mint(address _user, uint256 _times)',
+        params: [wallet, BigInt(dailyCount)],
+      });
+      const { transactionHash } = await sendTransaction({
+        account: serverAccount,
+        transaction,
+      });
+      console.log('MoneyDAO tokens minted successfully:', transactionHash);
 
+      // Mint succeeded — now mark existing rows as minted
+      for (const { id } of dailyToMint) {
+        const { error: updateError } = await supabase
+          .from('file_hashes')
+          .update({ minted: true })
+          .eq('id', id);
+        if (updateError) console.error('Supabase update error (daily):', updateError);
+        else console.log('Daily hash marked as minted:', id);
+      }
 
+      // Mint succeeded — now insert new rows as minted
+      for (const { fileHash, date, accountName } of dailyToInsert) {
+        const { error: insertError } = await supabase
+          .from('file_hashes')
+          .insert({
+            account_name: accountName,
+            file_hash: fileHash,
+            type: 'daily',
+            date,
+            week: null,
+            minted: true,
+            wallet,
+          });
+        if (insertError) console.error('Supabase insert error (daily):', insertError);
+        else console.log('New daily hash inserted as minted:', fileHash);
+      }
+    } else {
+      console.log('No daily tokens to mint');
+    }
 
- // NEW: Correct hash generation with accountName and wallet validation
- let dailyHashes = [];
- let weeklyHashes = [];
- console.log('Hashing daily items from dailyFiles');
- for (const item of jsonData.dailyFiles) {
-   if (!item.daily || !item.daily.accountName || !item.daily.date || !item.daily.wallet) {
-     console.warn('Skipping invalid daily item:', item);
-     continue;
-   }
-   if (item.daily.wallet !== wallet) {
-     console.warn('Wallet mismatch in daily item:', item.daily.wallet, wallet);
-     continue;
-   }
-   const fileHash = crypto.createHash('sha256').update(JSON.stringify(item.daily)).digest('hex');
-   dailyHashes.push({ fileHash, date: item.daily.date, accountName: item.daily.accountName });
-   console.log('Generated daily hash:', fileHash, 'date:', item.daily.date, 'accountName:', item.daily.accountName);
- }
- console.log('Daily hashes generated:', dailyHashes.length);
+    // Mint SourceDAO tokens for weekly — THEN mark in Supabase
+    if (weeklyCount > 0) {
+      console.log('Preparing to mint SourceDAO tokens:', weeklyCount);
+      const transaction = prepareContractCall({
+        contract: gameContractSourceDAO,
+        method: 'function Mint(address _user, uint256 _times)',
+        params: [wallet, BigInt(weeklyCount)],
+      });
+      const { transactionHash } = await sendTransaction({
+        account: serverAccount,
+        transaction,
+      });
+      console.log('SourceDAO tokens minted successfully:', transactionHash);
 
- console.log('Hashing weekly items from weeklyFiles');
- for (const item of jsonData.weeklyFiles) {
-   if (!item.weekly || !item.weekly.accountName || !item.weekly.week || !item.weekly.wallet) {
-     console.warn('Skipping invalid weekly item:', item);
-     continue;
-   }
-   if (item.weekly.wallet !== wallet) {
-     console.warn('Wallet mismatch in weekly item:', item.weekly.wallet, wallet);
-     continue;
-   }
-   const fileHash = crypto.createHash('sha256').update(JSON.stringify(item.weekly)).digest('hex');
-   weeklyHashes.push({ fileHash, week: item.weekly.week, accountName: item.weekly.accountName });
-   console.log('Generated weekly hash:', fileHash, 'week:', item.weekly.week, 'accountName:', item.weekly.accountName);
- }
- console.log('Weekly hashes generated:', weeklyHashes.length);
+      // Mint succeeded — now mark existing rows as minted
+      for (const { id } of weeklyToMint) {
+        const { error: updateError } = await supabase
+          .from('file_hashes')
+          .update({ minted: true })
+          .eq('id', id);
+        if (updateError) console.error('Supabase update error (weekly):', updateError);
+        else console.log('Weekly hash marked as minted:', id);
+      }
 
- // NEW: Process daily hashes
- let dailyCount = 0;
- console.log('Processing daily hashes in Supabase');
- for (const { fileHash, date, accountName } of dailyHashes) {
-   console.log('Checking daily hash:', fileHash, 'date:', date, 'accountName:', accountName);
-   const { data: existingHash, error } = await supabase
-     .from('file_hashes')
-     .select('id, minted')
-     .eq('account_name', accountName)
-     .eq('file_hash', fileHash)
-     .eq('type', 'daily')
-     .eq('date', date)
-     .eq('wallet', wallet)
-     .single();
+      // Mint succeeded — now insert new rows as minted
+      for (const { fileHash, week, accountName } of weeklyToInsert) {
+        const { error: insertError } = await supabase
+          .from('file_hashes')
+          .insert({
+            account_name: accountName,
+            file_hash: fileHash,
+            type: 'weekly',
+            date: null,
+            week,
+            minted: true,
+            wallet,
+          });
+        if (insertError) console.error('Supabase insert error (weekly):', insertError);
+        else console.log('New weekly hash inserted as minted:', fileHash);
+      }
+    } else {
+      console.log('No weekly tokens to mint');
+    }
 
-   if (error && error.code !== 'PGRST116') {
-     console.error('Supabase query error (daily):', error);
-     continue;
-   }
-
-   if (existingHash) {
-     if (!existingHash.minted) {
-       console.log('Found unminted daily hash, updating:', existingHash.id);
-       const { error: updateError } = await supabase
-         .from('file_hashes')
-         .update({ minted: true })
-         .eq('id', existingHash.id);
-       if (updateError) {
-         console.error('Supabase update error (daily):', updateError);
-         continue;
-       }
-       dailyCount++;
-       console.log('Daily hash marked as minted, count:', dailyCount);
-     }
-   } else {
-     console.log('Inserting new daily hash:', fileHash);
-     const { error: insertError } = await supabase
-       .from('file_hashes')
-       .insert({
-         account_name: accountName,
-         file_hash: fileHash,
-         type: 'daily',
-         date,
-         week: null,
-         minted: false,
-         wallet,
-       });
-     if (insertError) {
-       console.error('Supabase insert error (daily):', insertError);
-       continue;
-     }
-   }
- }
- console.log('Total daily matches:', dailyCount);
-
- // NEW: Process weekly hashes
- let weeklyCount = 0;
- console.log('Processing weekly hashes in Supabase');
- for (const { fileHash, week, accountName } of weeklyHashes) {
-   console.log('Checking weekly hash:', fileHash, 'week:', week, 'accountName:', accountName);
-   const { data: existingHash, error } = await supabase
-     .from('file_hashes')
-     .select('id, minted')
-     .eq('account_name', accountName)
-     .eq('file_hash', fileHash)
-     .eq('type', 'weekly')
-     .eq('week', week)
-     .eq('wallet', wallet)
-     .single();
-
-   if (error && error.code !== 'PGRST116') {
-     console.error('Supabase query error (weekly):', error);
-     continue;
-   }
-
-   if (existingHash) {
-     if (!existingHash.minted) {
-       console.log('Found unminted weekly hash, updating:', existingHash.id);
-       const { error: updateError } = await supabase
-         .from('file_hashes')
-         .update({ minted: true })
-         .eq('id', existingHash.id);
-       if (updateError) {
-         console.error('Supabase update error (weekly):', updateError);
-         continue;
-       }
-       weeklyCount++;
-       console.log('Weekly hash marked as minted, count:', weeklyCount);
-     }
-   } else {
-     console.log('Inserting new weekly hash:', fileHash);
-     const { error: insertError } = await supabase
-       .from('file_hashes')
-       .insert({
-         account_name: accountName,
-         file_hash: fileHash,
-         type: 'weekly',
-         date: null,
-         week,
-         minted: false,
-         wallet,
-       });
-     if (insertError) {
-       console.error('Supabase insert error (weekly):', insertError);
-       continue;
-     }
-   }
- }
- console.log('Total weekly matches:', weeklyCount);
-
- // Mint tokens using Thirdweb
- if (dailyCount > 0) {
-   console.log('Preparing to mint MoneyDAO tokens:', dailyCount);
-   const transaction = prepareContractCall({
-     contract: gameContractMoneyDAO,
-     method: 'function Mint(address _user, uint256 _times)',
-     params: [wallet, BigInt(dailyCount)],
-   });
-   const { transactionHash } = await sendTransaction({
-     account: serverAccount,
-     transaction,
-   });
-   console.log('MoneyDAO tokens minted successfully');
- } else {
-   console.log('No daily tokens to mint');
- }
-
- if (weeklyCount > 0) {
-   console.log('Preparing to mint SourceDAO tokens:', weeklyCount);
-   const transaction = prepareContractCall({
-     contract: gameContractSourceDAO,
-     method: 'function Mint(address _user, uint256 _times)',
-     params: [wallet, BigInt(weeklyCount)],
-   });
-   console.log('Sending SourceDAO mint transaction');
-   const { transactionHash } = await sendTransaction({
-     account: serverAccount,
-     transaction,
-   });
-   console.log('SourceDAO tokens minted successfully');
- } else {
-   console.log('No weekly tokens to mint');
- }
-
- console.log('Request completed successfully:', { dailyCount, weeklyCount });
- return NextResponse.json({ success: true, dailyCount, weeklyCount }, { status: 200 });
-} catch (err) {
- console.error('File upload error:', err);
- return NextResponse.json({ error: 'Server error', details: err.message }, { status: 500 });
-}
+    console.log('Request completed successfully:', { dailyCount, weeklyCount });
+    return NextResponse.json({ success: true, dailyCount, weeklyCount }, { status: 200 });
+  } catch (err) {
+    console.error('File upload error:', err);
+    return NextResponse.json({ error: 'Server error', details: err.message }, { status: 500 });
+  }
 }
