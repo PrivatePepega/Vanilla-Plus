@@ -78,6 +78,15 @@ export async function POST(req) {
     // Fetch secrets
     const { SUPABASE_URL, SUPABASE_KEY, APP_SECRET, SERVER_WALLET_PASSWORD, RSA_PUBLIC, RSA_PRIVATE } = await getSecrets();
 
+
+    console.log('SERVER_WALLET_PASSWORD exists:', !!SERVER_WALLET_PASSWORD);
+    console.log('SERVER_WALLET_PASSWORD length:', SERVER_WALLET_PASSWORD?.length);
+    console.log('THIRDWEB_CLIENT_ID:', process.env.NEXT_PUBLIC_THIRDWEB_CLIENT_ID);
+    console.log('serverAccount:', serverAccount);
+    console.log('serverAccount.address:', serverAccount?.address);
+
+
+
     if (!SUPABASE_URL || !SUPABASE_KEY || !SERVER_WALLET_PASSWORD) {
       console.error('Missing required secrets');
       return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
