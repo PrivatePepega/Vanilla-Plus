@@ -234,7 +234,7 @@ export async function POST(req) {
         account: serverAccount,
         transaction,
       });
-      console.log('MoneyDAO tokens minted successfully:', transactionHash);
+      console.log('Credit tokens minted successfully:', transactionHash);
 
       // Mint succeeded — now mark existing rows as minted
       for (const { id } of dailyToMint) {
@@ -278,7 +278,7 @@ export async function POST(req) {
         account: serverAccount,
         transaction,
       });
-      console.log('SourceDAO tokens minted successfully:', transactionHash);
+      console.log('DAO tokens minted successfully:', transactionHash);
 
       // Mint succeeded — now mark existing rows as minted
       for (const { id } of weeklyToMint) {
