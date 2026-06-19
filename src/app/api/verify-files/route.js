@@ -95,37 +95,15 @@ export async function POST(req) {
     console.log('Supabase client initialized');
 
     // Initialize server wallet
-      console.log('Initializing server wallet');
-      let serverAccount;
-      try {
-        serverAccount = privateKeyToAccount({
-          client: { clientId: process.env.NEXT_PUBLIC_THIRDWEB_CLIENT_ID },
-          privateKey: SERVER_WALLET_PASSWORD,
-        });
-        console.log('Server wallet initialized:', serverAccount?.address);
-      } catch (walletErr) {
-        console.error('privateKeyToAccount threw an error:', walletErr.message);
-        return NextResponse.json({ error: 'Server error', details: `Wallet init failed: ${walletErr.message}` }, { status: 500 });
-      }
+    console.log('Initializing server wallet');
+    const serverAccount = privateKeyToAccount({
+      client: { clientId: process.env.NEXT_PUBLIC_THIRDWEB_CLIENT_ID },
+      privateKey: SERVER_WALLET_PASSWORD,
+    });
+    console.log('Server wallet initialized:', serverAccount?.address);
 
-      if (!serverAccount || !serverAccount.address) {
-        console.error('serverAccount is invalid after init:', serverAccount);
-        return NextResponse.json({
-          error: 'Server error',
-          details: 'serverAccount invalid',
-          debug: {
-            clientIdExists: !!process.env.NEXT_PUBLIC_THIRDWEB_CLIENT_ID,
-            privateKeyLength: SERVER_WALLET_PASSWORD?.length,
-            privateKeyPrefix: SERVER_WALLET_PASSWORD?.slice(0, 4),
-          }
-        }, { status: 500 });
-      }
 
-    console.log('SERVER_WALLET_PASSWORD exists:', !!SERVER_WALLET_PASSWORD);
-    console.log('SERVER_WALLET_PASSWORD length:', SERVER_WALLET_PASSWORD?.length);
-    console.log('THIRDWEB_CLIENT_ID:', process.env.NEXT_PUBLIC_THIRDWEB_CLIENT_ID);
-    console.log('serverAccount:', serverAccount);
-    console.log('serverAccount.address:', serverAccount?.address);
+
     
     // Upsert accounts for each unique accountName
     const accountNames = [
@@ -260,11 +238,25 @@ export async function POST(req) {
         method: 'function Mint(address _user, uint256 _times)',
         params: [wallet, BigInt(dailyCount)],
       });
-      const { transactionHash } = await sendTransaction({
-        account: serverAccount,
-        transaction,
-      });
-      console.log('Credit tokens minted successfully:', transactionHash);
+
+
+
+
+      let transactionHash;
+      try {
+        const result = await sendTransaction({
+          account: serverAccount,
+          transaction,
+        });
+        transactionHash = result.transactionHash;
+        console.log('Credit tokens minted successfully:', transactionHash);
+      } catch (txErr) {
+        console.error('sendTransaction threw:', txErr.message);
+        return NextResponse.json({ error: 'Server error', details: `Mint failed: ${txErr.message}` }, { status: 500 });
+      }
+
+
+
 
       // Mint succeeded — now mark existing rows as minted
       for (const { id } of dailyToMint) {
