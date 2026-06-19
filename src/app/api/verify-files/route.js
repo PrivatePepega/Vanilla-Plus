@@ -95,13 +95,31 @@ export async function POST(req) {
     console.log('Supabase client initialized');
 
     // Initialize server wallet
-    console.log('Initializing server wallet');
-    const serverAccount = privateKeyToAccount({
-      client: { clientId: process.env.NEXT_PUBLIC_THIRDWEB_CLIENT_ID },
-      privateKey: SERVER_WALLET_PASSWORD,
-    });
-    console.log('Server wallet initialized:', serverAccount?.address);
+      console.log('Initializing server wallet');
+      let serverAccount;
+      try {
+        serverAccount = privateKeyToAccount({
+          client: { clientId: process.env.NEXT_PUBLIC_THIRDWEB_CLIENT_ID },
+          privateKey: SERVER_WALLET_PASSWORD,
+        });
+        console.log('Server wallet initialized:', serverAccount?.address);
+      } catch (walletErr) {
+        console.error('privateKeyToAccount threw an error:', walletErr.message);
+        return NextResponse.json({ error: 'Server error', details: `Wallet init failed: ${walletErr.message}` }, { status: 500 });
+      }
 
+      if (!serverAccount || !serverAccount.address) {
+        console.error('serverAccount is invalid after init:', serverAccount);
+        return NextResponse.json({
+          error: 'Server error',
+          details: 'serverAccount invalid',
+          debug: {
+            clientIdExists: !!process.env.NEXT_PUBLIC_THIRDWEB_CLIENT_ID,
+            privateKeyLength: SERVER_WALLET_PASSWORD?.length,
+            privateKeyPrefix: SERVER_WALLET_PASSWORD?.slice(0, 4),
+          }
+        }, { status: 500 });
+      }
 
     console.log('SERVER_WALLET_PASSWORD exists:', !!SERVER_WALLET_PASSWORD);
     console.log('SERVER_WALLET_PASSWORD length:', SERVER_WALLET_PASSWORD?.length);
