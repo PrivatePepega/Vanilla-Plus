@@ -3,7 +3,7 @@ import crypto from 'crypto';
 import { SecretsManagerClient, GetSecretValueCommand } from '@aws-sdk/client-secrets-manager';
 import { NextResponse } from 'next/server';
 import { prepareContractCall, sendTransaction } from 'thirdweb';
-import { gameContractMoneyDAO, gameContractSourceDAO } from '@/utils/functionDump/getContracts';
+import { contractMoneyDAO, contractSourceDAO } from '@/utils/functionDump/getContracts';
 import { privateKeyToAccount } from 'thirdweb/wallets';
 
 export async function POST(req) {
@@ -234,26 +234,20 @@ export async function POST(req) {
     if (dailyCount > 0) {
       console.log('Preparing to mint MoneyDAO tokens:', dailyCount);
       const transaction = prepareContractCall({
-        contract: gameContractMoneyDAO,
+        contract: contractMoneyDAO,
         method: 'function Mint(address _user, uint256 _times)',
         params: [wallet, BigInt(dailyCount)],
       });
 
 
 
+      
+      const { transactionHash } = await sendTransaction({
+        account: serverAccount,
+        transaction,
+      });
+      console.log('Credit tokens minted successfully:', transactionHash);
 
-      let transactionHash;
-      try {
-        const result = await sendTransaction({
-          account: serverAccount,
-          transaction,
-        });
-        transactionHash = result.transactionHash;
-        console.log('Credit tokens minted successfully:', transactionHash);
-      } catch (txErr) {
-        console.error('sendTransaction threw:', txErr.message);
-        return NextResponse.json({ error: 'Server error', details: `Mint failed: ${txErr.message}` }, { status: 500 });
-      }
 
 
 
@@ -292,7 +286,7 @@ export async function POST(req) {
     if (weeklyCount > 0) {
       console.log('Preparing to mint SourceDAO tokens:', weeklyCount);
       const transaction = prepareContractCall({
-        contract: gameContractSourceDAO,
+        contract: contractSourceDAO,
         method: 'function Mint(address _user, uint256 _times)',
         params: [wallet, BigInt(weeklyCount)],
       });
