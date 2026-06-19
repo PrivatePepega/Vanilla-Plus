@@ -2,7 +2,7 @@ import { createClient } from '@supabase/supabase-js';
 import crypto from 'crypto';
 import { SecretsManagerClient, GetSecretValueCommand } from '@aws-sdk/client-secrets-manager';
 import { NextResponse } from 'next/server';
-import { prepareContractCall, sendTransaction } from 'thirdweb';
+import { prepareContractCall, sendTransaction, waitForReceipt  } from 'thirdweb';
 import { contractMoneyDAO, contractSourceDAO } from '@/utils/functionDump/getContracts';
 import { privateKeyToAccount } from 'thirdweb/wallets';
 
@@ -248,7 +248,12 @@ export async function POST(req) {
       });
       console.log('Credit tokens minted successfully:', transactionHash);
 
-
+      const dailyReceipt = await waitForReceipt({
+        client: serverAccount.client,
+        chain: contractMoneyDAO.chain,
+        transactionHash,
+      });
+      console.log('Credit tokens confirmed on-chain:', dailyReceipt.status);
 
 
 
@@ -295,6 +300,15 @@ export async function POST(req) {
         transaction,
       });
       console.log('DAO tokens minted successfully:', transactionHash);
+
+
+      const weeklyReceipt = await waitForReceipt({
+        client: serverAccount.client,
+        chain: contractSourceDAO.chain,
+        transactionHash,
+      });
+      console.log('DAO tokens confirmed on-chain:', weeklyReceipt.status);
+
 
       // Mint succeeded — now mark existing rows as minted
       for (const { id } of weeklyToMint) {
