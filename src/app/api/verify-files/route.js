@@ -5,6 +5,7 @@ import { NextResponse } from 'next/server';
 import { prepareContractCall, sendTransaction, waitForReceipt  } from 'thirdweb';
 import { contractMoneyDAO, contractSourceDAO } from '@/utils/functionDump/getContracts';
 import { privateKeyToAccount } from 'thirdweb/wallets';
+import { client } from '@/utils/thirdweb/client';
 
 export async function POST(req) {
   try {
@@ -249,7 +250,7 @@ export async function POST(req) {
       console.log('Credit tokens minted successfully:', transactionHash);
 
       const dailyReceipt = await waitForReceipt({
-        client: serverAccount.client,
+        client,
         chain: contractMoneyDAO.chain,
         transactionHash,
       });
@@ -303,7 +304,7 @@ export async function POST(req) {
 
 
       const weeklyReceipt = await waitForReceipt({
-        client: serverAccount.client,
+        client,
         chain: contractSourceDAO.chain,
         transactionHash,
       });
