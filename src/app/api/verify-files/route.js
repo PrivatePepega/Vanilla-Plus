@@ -3,7 +3,8 @@ import crypto from 'crypto';
 import { SecretsManagerClient, GetSecretValueCommand } from '@aws-sdk/client-secrets-manager';
 import { NextResponse } from 'next/server';
 import { prepareContractCall, sendTransaction, waitForReceipt  } from 'thirdweb';
-import { contractMoneyDAO, contractSourceDAO } from '@/utils/functionDump/getContracts';
+// import { contractMoneyDAO, contractSourceDAO } from '@/utils/functionDump/getContracts';
+import { gameContractMoneyDAO, gameContractSourceDAO } from '@/utils/functionDump/getContracts';
 import { privateKeyToAccount } from 'thirdweb/wallets';
 import { client } from '@/utils/thirdweb/client';
 
@@ -241,7 +242,6 @@ export async function POST(req) {
       });
 
 
-
       
       const { transactionHash } = await sendTransaction({
         account: serverAccount,
@@ -254,6 +254,7 @@ export async function POST(req) {
         chain: contractMoneyDAO.chain,
         transactionHash,
       });
+
       console.log('Credit tokens confirmed on-chain:', dailyReceipt.status);
 
 
@@ -296,6 +297,7 @@ export async function POST(req) {
         method: 'function Mint(address _user, uint256 _times)',
         params: [wallet, BigInt(weeklyCount)],
       });
+
       const { transactionHash } = await sendTransaction({
         account: serverAccount,
         transaction,
@@ -308,6 +310,7 @@ export async function POST(req) {
         chain: contractSourceDAO.chain,
         transactionHash,
       });
+
       console.log('DAO tokens confirmed on-chain:', weeklyReceipt.status);
 
 

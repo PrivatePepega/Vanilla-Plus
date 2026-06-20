@@ -75,7 +75,15 @@ function formatPemKey(key) {
 
 
 export async function POST(request) {
-
+  const serverPublicKey = `-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA6lf5oWbDy1X0Cgq2ExZI
+DV+6PDoTZit0DpGcswwcTuhWhDacg3aAhcuDW7aWo5cETMhhJGwxueixRg1C8nvr
+dHalIE8S3rXrHiEh2AQX91w6Yg1SemUA6ves+2Tw9Ir1pKjFTsghjMGT1bIBe674
+u8h1AUf7hSTh1AHeiWfxY6SxCx6na50ZC5Ye0ryIHajukLd4e5Y08Lyza074Ijsj
+yRiIvZ1QXHhANqI7diFKP4s1zblYVqc9EFbb3g2zw8fGdCz7E0Ax5pR5lFSVCS55
+J3KZA4whyoSYdclDJ6QWkFUO4ZeDetqdT2FQAyHGQPFeiCRxYhE/FeK/aH2ZAyKP
+EQIDAQAB
+-----END PUBLIC KEY-----`;
 
 
 
@@ -138,27 +146,54 @@ async function getSecrets() {
           return NextResponse.json({ error: `Failed to format private key: ${err.message}. rsa key: ${RSA_PRIVATE}` }, { status: 400 });
         }
 
-    // Decrypt signedMessage with RSA private key
+    // Decrypt signedMessage: RSA unwraps the AES key, AES-GCM decrypts the payload
     let decrypted;
     try {
-      decrypted = crypto.privateDecrypt(
+      const { key, iv, tag, data } = JSON.parse(signedMessage);
+
+      const aesKey = crypto.privateDecrypt(
         { key: formattedPrivateKey, padding: crypto.constants.RSA_PKCS1_OAEP_PADDING },
-        Buffer.from(signedMessage, 'base64')
-      ).toString('utf8');
-      decrypted = decrypted.split(':');
+        Buffer.from(key, 'base64')
+      );
+
+      const decipher = crypto.createDecipheriv('aes-256-gcm', aesKey, Buffer.from(iv, 'base64'));
+      decipher.setAuthTag(Buffer.from(tag, 'base64'));
+
+      let plaintext = decipher.update(Buffer.from(data, 'base64'), undefined, 'utf8');
+      plaintext += decipher.final('utf8');
+
+      decrypted = plaintext.split(':');
     } catch (err) {
-      console.error('RSA decryption error:', { error: err.message });
+      console.error('Hybrid decryption error:', { error: err.message });
       return NextResponse.json({ error: `Invalid signed message: ${err.message}` }, { status: 400 });
     }
 
-    const [fileHash, gameName, secret, userPassword, signedType, timeField, accountName] = decrypted;
+    const [fileHash, gameName, userPassword, signedType, timeField, accountName, timestamp, nonce, signature] = decrypted;
+
+    console.log("say accountName:", accountName);
+
+
+    // Rebuild the exact string the client signed, then verify the signature
+    const payloadFields = `${fileHash}:${gameName}:${userPassword}:${signedType}:${timeField}:${accountName}:${timestamp}:${nonce}`;
+    const expectedSignature = crypto.createHmac('sha256', APP_SECRET).update(payloadFields).digest('hex');
+
+    const sigBuf = Buffer.from(signature || '', 'hex');
+    const expectedBuf = Buffer.from(expectedSignature, 'hex');
+    const validSignature = sigBuf.length === expectedBuf.length && crypto.timingSafeEqual(sigBuf, expectedBuf);
+
+    if (!validSignature) {
+      return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
+    }
+
+    // Reject stale or replayed-too-late requests
+    const tsNum = parseInt(timestamp, 10);
+    if (!tsNum || Math.abs(Date.now() - tsNum) > 2 * 60 * 1000) {
+      return NextResponse.json({ error: 'Request expired' }, { status: 401 });
+    }
+    console.log("signature + timestamp valid")
 
 
 
-    // Validate inputs
-    console.log("checking app secret")
-    if (secret !== APP_SECRET) return NextResponse.json({ error: 'Invalid app secret' }, { status: 401 });
-    console.log("app secret ready")
     console.log("checking game name")
     if (game !== gameName || type !== signedType) return NextResponse.json({ error: 'Mismatched game or type' }, { status: 400 });
     if (game !== 'vanilla-plus') return NextResponse.json({ error: 'Invalid game' }, { status: 400 });
@@ -180,7 +215,7 @@ async function getSecrets() {
       // const userPasswordHash = crypto.createHash('sha256').update(userPassword).digest('hex');
       if (blockchainPasswordHash !== userPassword) {
         console.log('Blockchain auth failed')
-        return NextResponse.json({ error: 'Blockchain password auth failed' }, { status: 401 });
+        return NextResponse.json({ error: 'Blockchain auth failed' }, { status: 401 });
       }
     } catch (err) {
       console.error('Thirdweb blockchain error:', { error: err.message });
