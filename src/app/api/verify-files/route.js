@@ -3,8 +3,7 @@ import crypto from 'crypto';
 import { SecretsManagerClient, GetSecretValueCommand } from '@aws-sdk/client-secrets-manager';
 import { NextResponse } from 'next/server';
 import { prepareContractCall, sendTransaction, waitForReceipt  } from 'thirdweb';
-// import { contractMoneyDAO, contractSourceDAO } from '@/utils/functionDump/getContracts';
-import { gameContractMoneyDAO, gameContractSourceDAO } from '@/utils/functionDump/getContracts';
+import { contractMoneyDAO, contractSourceDAO } from '@/utils/functionDump/getContracts';
 import { privateKeyToAccount } from 'thirdweb/wallets';
 import { client } from '@/utils/thirdweb/client';
 
