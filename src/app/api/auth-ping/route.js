@@ -15,7 +15,12 @@ import { contractPassport } from "@/utils/functionDump/getContracts"
 
 
 
-
+function getCurrentWeek() {
+  const now = new Date();
+  const startOfYear = new Date(now.getFullYear(), 0, 1);
+  const weekNumber = Math.ceil(((now - startOfYear) / 86400000 + startOfYear.getDay() + 1) / 7);
+  return `${now.getFullYear()}-W${String(weekNumber).padStart(2, '0')}`;
+}
 
 function formatPemKey(key) {
   try {
@@ -185,12 +190,30 @@ async function getSecrets() {
       return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
     }
 
+
+
+    
     // Reject stale or replayed-too-late requests
     const tsNum = parseInt(timestamp, 10);
     if (!tsNum || Math.abs(Date.now() - tsNum) > 2 * 60 * 1000) {
       return NextResponse.json({ error: 'Request expired' }, { status: 401 });
     }
     console.log("signature + timestamp valid")
+    if (type === 'daily') {
+      const today = new Date().toISOString().split('T')[0]; // "2026-07-05"
+      if (cache.date !== today) {
+        return NextResponse.json({ error: 'Invalid date: must be today' }, { status: 400 });
+      }
+    }
+    
+    if (type === 'weekly') {
+      const currentWeek = getCurrentWeek(); // "2026-W43"
+      if (cache.week !== currentWeek) {
+        return NextResponse.json({ error: 'Invalid week: must be current week' }, { status: 400 });
+      }
+    }
+
+
 
 
 
