@@ -1,19 +1,9 @@
 import { createClient } from '@supabase/supabase-js';
-import { chainById } from '@/utils/thirdweb/chains';
 import crypto from 'crypto';
 import { SecretsManagerClient, GetSecretValueCommand } from '@aws-sdk/client-secrets-manager';
 import { NextResponse } from 'next/server';
-import { readContract } from 'thirdweb'; 
-import { contractPassport } from "@/utils/functionDump/getContracts"
-
-
-
-
-
-
-
-
-
+import { readContract } from 'thirdweb';
+import { contractPassport } from "@/utils/functionDump/getContracts";
 
 function getCurrentWeek() {
   const now = new Date();
@@ -21,61 +11,47 @@ function getCurrentWeek() {
   const weekNumber = Math.ceil(((now - startOfYear) / 86400000 + startOfYear.getDay() + 1) / 7);
   return `${now.getFullYear()}-W${String(weekNumber).padStart(2, '0')}`;
 }
+function normalizeDate(dateStr) {
+  if (!dateStr) return null;
+  // handles "2026-07-5" and "2026-07-05" → always "2026-07-05"
+  const [year, month, day] = dateStr.split('-');
+  return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+}
 
-function formatPemKey(key) {
-  try {
-    // Trim any extra crap
-    let trimmedKey = key.trim();
-
-    // Define the headers
-    const beginHeader = '-----BEGIN PRIVATE KEY-----';
-    const endHeader = '-----END PRIVATE KEY-----';
-
-    // Find where the headers are
-    const beginIndex = trimmedKey.indexOf(beginHeader);
-    const endIndex = trimmedKey.indexOf(endHeader);
-
-    // If headers are missing or fucked up, bail
-    if (beginIndex === -1 || endIndex === -1 || beginIndex >= endIndex) {
-      throw new Error('Headers are there but something’s messed up, bro');
-    }
-
-    // Pull out the base64 meat between the headers
-    let base64Content = trimmedKey.slice(beginIndex + beginHeader.length, endIndex).trim();
-
-    // Nuke all whitespace from the base64
-    base64Content = base64Content.replace(/\s+/g, '');
-
-    // Make sure it’s legit base64
-    if (!/^[A-Za-z0-9+/=]+$/.test(base64Content)) {
-      throw new Error('Base64 content is jacked up');
-    }
-
-    // Chop it into 64-char lines
-    const lines = [];
-    for (let i = 0; i < base64Content.length; i += 64) {
-      lines.push(base64Content.slice(i, i + 64));
-    }
-
-    // Slap it back together with newlines
-    const formattedKey = `${beginHeader}\n${lines.join('\n')}\n${endHeader}\n`;
-
-    // Log it so we can see what’s up
-    // console.log('Formatted key preview:\n', formattedKey.slice(0, 100) + '...');
-    return formattedKey;
-  } catch (err) {
-    console.error('Failed to format PEM key, dude:', { error: err.message });
-    throw err;
-  }
+function normalizeWeek(weekStr) {
+  if (!weekStr) return null;
+  // handles "2026-W3" and "2026-W03" → always "2026-W03"
+  const [year, week] = weekStr.split('-W');
+  return `${year}-W${week.padStart(2, '0')}`;
 }
 
 
 
-
-
-
-
-
+function formatPemKey(key) {
+  try {
+    let trimmedKey = key.trim();
+    const beginHeader = '-----BEGIN PRIVATE KEY-----';
+    const endHeader = '-----END PRIVATE KEY-----';
+    const beginIndex = trimmedKey.indexOf(beginHeader);
+    const endIndex = trimmedKey.indexOf(endHeader);
+    if (beginIndex === -1 || endIndex === -1 || beginIndex >= endIndex) {
+      throw new Error('PEM headers missing or malformed');
+    }
+    let base64Content = trimmedKey.slice(beginIndex + beginHeader.length, endIndex).trim();
+    base64Content = base64Content.replace(/\s+/g, '');
+    if (!/^[A-Za-z0-9+/=]+$/.test(base64Content)) {
+      throw new Error('Base64 content is invalid');
+    }
+    const lines = [];
+    for (let i = 0; i < base64Content.length; i += 64) {
+      lines.push(base64Content.slice(i, i + 64));
+    }
+    return `${beginHeader}\n${lines.join('\n')}\n${endHeader}\n`;
+  } catch (err) {
+    console.error('Failed to format PEM key:', { error: err.message });
+    throw err;
+  }
+}
 
 
 
@@ -92,29 +68,19 @@ EQIDAQAB
 
 
 
-const secretsManager = new SecretsManagerClient({
-  region: 'us-east-1',
-  credentials: {
-    accessKeyId: process.env.GB_ACCESS_KEY_ID,
-    secretAccessKey: process.env.GB_SECRET_ACCESS_KEY,
-  },
-});
-
-
-
-
-
-async function getSecrets() {
-  try {
+  async function getSecrets() {
+    const secretsManager = new SecretsManagerClient({
+      region: 'us-east-1',
+      credentials: {
+        accessKeyId: process.env.GB_ACCESS_KEY_ID,
+        secretAccessKey: process.env.GB_SECRET_ACCESS_KEY,
+      },
+    });
     const command = new GetSecretValueCommand({ SecretId: process.env.GB_SECRET_ID });
     const data = await secretsManager.send(command);
     if ('SecretString' in data) return JSON.parse(data.SecretString);
     throw new Error('Secrets not found');
-  } catch (err) {
-    console.error('SecretsManager error:', { error: err.message });
-    throw err;
   }
-}
 
 
   try {
@@ -124,49 +90,52 @@ async function getSecrets() {
       return NextResponse.json({ error: 'Missing fields' }, { status: 400 });
     }
 
-    const { SUPABASE_URL, SUPABASE_KEY, APP_SECRET, SERVER_WALLET_PASSWORD, RSA_PUBLIC, RSA_PRIVATE } = await getSecrets();
+    const { SUPABASE_URL, SUPABASE_KEY, APP_SECRET, RSA_PRIVATE } = await getSecrets();
 
-
-    // Validate secrets
     if (!SUPABASE_URL || !SUPABASE_KEY || !APP_SECRET || !RSA_PRIVATE) {
-      console.error('Missing required secrets');
       return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
     }
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // Validate RSA_PRIVATE
+    // --- DOOR 1: phone verified check ---
+    const { data: walletRow, error: walletError } = await supabase
+      .from('wallets')
+      .select('phone_verified')
+      .eq('wallet', wallet)
+      .single();
+
+    if (walletError || !walletRow) {
+      return NextResponse.json({ error: 'Wallet not registered' }, { status: 401 });
+    }
+    if (!walletRow.phone_verified) {
+      return NextResponse.json({ error: 'Phone not verified' }, { status: 401 });
+    }
+    console.log('Phone verified check passed');
+
+    // --- Decrypt payload ---
     if (!RSA_PRIVATE.includes('-----BEGIN PRIVATE KEY-----')) {
-      console.error('Invalid RSA_PRIVATE: Missing PEM format');
       return NextResponse.json({ error: 'Server key configuration error' }, { status: 500 });
     }
 
-        // Reformat the private key to PEM with newlines
-        let formattedPrivateKey;
-        try {
+    let formattedPrivateKey;
+    try {
+      formattedPrivateKey = formatPemKey(RSA_PRIVATE);
+    } catch (err) {
+      return NextResponse.json({ error: `Failed to format private key: ${err.message}` }, { status: 400 });
+    }
 
-          formattedPrivateKey = formatPemKey(RSA_PRIVATE);
-
-        } catch (err) {
-          return NextResponse.json({ error: `Failed to format private key: ${err.message}. rsa key: ${RSA_PRIVATE}` }, { status: 400 });
-        }
-
-    // Decrypt signedMessage: RSA unwraps the AES key, AES-GCM decrypts the payload
     let decrypted;
     try {
       const { key, iv, tag, data } = JSON.parse(signedMessage);
-
       const aesKey = crypto.privateDecrypt(
         { key: formattedPrivateKey, padding: crypto.constants.RSA_PKCS1_OAEP_PADDING },
         Buffer.from(key, 'base64')
       );
-
       const decipher = crypto.createDecipheriv('aes-256-gcm', aesKey, Buffer.from(iv, 'base64'));
       decipher.setAuthTag(Buffer.from(tag, 'base64'));
-
       let plaintext = decipher.update(Buffer.from(data, 'base64'), undefined, 'utf8');
       plaintext += decipher.final('utf8');
-
       decrypted = plaintext.split(':');
     } catch (err) {
       console.error('Hybrid decryption error:', { error: err.message });
@@ -175,13 +144,9 @@ async function getSecrets() {
 
     const [fileHash, gameName, userPassword, signedType, timeField, accountName, timestamp, nonce, signature] = decrypted;
 
-    console.log("say accountName:", accountName);
-
-
-    // Rebuild the exact string the client signed, then verify the signature
+    // --- HMAC signature check ---
     const payloadFields = `${fileHash}:${gameName}:${userPassword}:${signedType}:${timeField}:${accountName}:${timestamp}:${nonce}`;
     const expectedSignature = crypto.createHmac('sha256', APP_SECRET).update(payloadFields).digest('hex');
-
     const sigBuf = Buffer.from(signature || '', 'hex');
     const expectedBuf = Buffer.from(expectedSignature, 'hex');
     const validSignature = sigBuf.length === expectedBuf.length && crypto.timingSafeEqual(sigBuf, expectedBuf);
@@ -190,107 +155,68 @@ async function getSecrets() {
       return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
     }
 
-
-
-    
-    // Reject stale or replayed-too-late requests
+    // --- Timestamp check ---
     const tsNum = parseInt(timestamp, 10);
     if (!tsNum || Math.abs(Date.now() - tsNum) > 2 * 60 * 1000) {
       return NextResponse.json({ error: 'Request expired' }, { status: 401 });
     }
-    console.log("signature + timestamp valid")
+    console.log('Signature + timestamp valid');
+
+    // --- Date/week check ---
     if (type === 'daily') {
-      const today = new Date().toISOString().split('T')[0]; // "2026-07-05"
+      const today = new Date().toISOString().split('T')[0];
       if (cache.date !== today) {
         return NextResponse.json({ error: 'Invalid date: must be today' }, { status: 400 });
       }
     }
-    
-    if (type === 'weekly') {
-      const currentWeek = getCurrentWeek(); // "2026-W43"
-      if (cache.week !== currentWeek) {
-        return NextResponse.json({ error: 'Invalid week: must be current week' }, { status: 400 });
+    if (type === 'daily') {
+      const today = new Date().toISOString().split('T')[0]; // always "2026-07-05"
+      const normalizedCacheDate = normalizeDate(cache.date);
+      if (normalizedCacheDate !== today) {
+        return NextResponse.json({ error: 'Invalid date: must be today' }, { status: 400 });
       }
+      cache.date = normalizedCacheDate; // normalize before storing
     }
 
+    // --- Game + type validation ---
+    if (game !== gameName || type !== signedType) {
+      return NextResponse.json({ error: 'Mismatched game or type' }, { status: 400 });
+    }
+    if (game !== 'vanilla-plus') {
+      return NextResponse.json({ error: 'Invalid game' }, { status: 400 });
+    }
+    if (!['daily', 'weekly'].includes(type)) {
+      return NextResponse.json({ error: 'Invalid type' }, { status: 400 });
+    }
 
-
-
-
-    console.log("checking game name")
-    if (game !== gameName || type !== signedType) return NextResponse.json({ error: 'Mismatched game or type' }, { status: 400 });
-    if (game !== 'vanilla-plus') return NextResponse.json({ error: 'Invalid game' }, { status: 400 });
-    console.log("game name ready")
-    console.log("checking mint type")
-    if (!['daily', 'weekly'].includes(type)) return NextResponse.json({ error: 'Invalid type' }, { status: 400 });
-    console.log("mint type ready")
-
-    // Verify blockchain password
+    // --- DOOR 2: blockchain password check ---
     try {
-
       const blockchainPasswordHash = await readContract({
         contract: contractPassport,
         method: "function viewUserPassword(address _user) view returns (string memory)",
         params: [wallet]
       });
-
-
-      // const userPasswordHash = crypto.createHash('sha256').update(userPassword).digest('hex');
       if (blockchainPasswordHash !== userPassword) {
-        console.log('Blockchain auth failed')
+        console.log('Blockchain auth failed');
         return NextResponse.json({ error: 'Blockchain auth failed' }, { status: 401 });
       }
     } catch (err) {
       console.error('Thirdweb blockchain error:', { error: err.message });
       return NextResponse.json({ error: 'Blockchain verification failed' }, { status: 500 });
     }
-      console.log("blockchain user's password ready")
+    console.log('Blockchain password ready');
 
-
-
-
-
-
-
-
-
-
-
-
-    
-
-    // NEW: Upsert account in accounts table
-    // Ensures the account_name exists for the specific game_name. If not, inserts it.
-    const { data: account, error: accountError } = await supabase
-      .from('accounts')
-      .select('account_name')
-      .eq('account_name', accountName)
-      .eq('game_name', 'vanilla-plus')
-      .single();
-    if (accountError && accountError.code !== 'PGRST116') {
-      console.error('Supabase account query error:', accountError);
-      return NextResponse.json({ error: 'Database error' }, { status: 500 });
-    }
-    if (!account) {
-      const { error: insertError } = await supabase
-        .from('accounts')
-        .insert({ account_name: accountName, game_name: 'vanilla-plus' });
-      if (insertError) {
-        console.error('Supabase account insert error:', insertError);
-        return NextResponse.json({ error: 'Database error' }, { status: 500 });
-      }
-    }
-
-    // NEW: Check for existing file hash
-    // Queries file_hashes to prevent duplicate daily/weekly completions for the account_name.
+    // --- Duplicate check ---
     const timeFieldValue = type === 'daily' ? cache.date : cache.week;
     const { data: existingHash, error: hashError } = await supabase
       .from('file_hashes')
       .select('id')
       .eq('account_name', accountName)
+      .eq('game_name', game)
       .eq('type', type)
       .eq(type === 'daily' ? 'date' : 'week', timeFieldValue)
       .single();
+
     if (hashError && hashError.code !== 'PGRST116') {
       console.error('Supabase hash query error:', hashError);
       return NextResponse.json({ error: 'Database error' }, { status: 500 });
@@ -299,17 +225,18 @@ async function getSecrets() {
       return NextResponse.json({ error: `${type.charAt(0).toUpperCase() + type.slice(1)} log already exists` }, { status: 409 });
     }
 
-
-    // NEW: Insert new file hash
-    // Inserts the file hash into file_hashes, tied to account_name, with wallet for minting.
+    // --- File hash integrity check ---
     const computedFileHash = crypto.createHash('sha256').update(JSON.stringify(cache)).digest('hex');
     if (computedFileHash !== fileHash) {
       return NextResponse.json({ error: 'File hash mismatch' }, { status: 400 });
     }
-    const { error } = await supabase
+
+    // --- Insert file hash ---
+    const { error: insertError } = await supabase
       .from('file_hashes')
       .insert({
         account_name: accountName,
+        game_name: game,
         file_hash: fileHash,
         type,
         date: type === 'daily' ? cache.date : null,
@@ -317,17 +244,17 @@ async function getSecrets() {
         minted: false,
         wallet,
       });
-    if (error) {
-      console.error('Supabase insert error:', error);
-      return NextResponse.json({ error: `Failed to log ${type}: ${error.message}` }, { status: 500 });
+
+    if (insertError) {
+      console.error('Supabase insert error:', insertError);
+      return NextResponse.json({ error: `Failed to log ${type}: ${insertError.message}` }, { status: 500 });
     }
 
+    console.log('Payload successfully received');
     return NextResponse.json({ success: true }, { status: 200 });
+
   } catch (err) {
     console.error('Auth ping error:', { error: err.message });
     return NextResponse.json({ error: 'Server error' }, { status: 500 });
   }
-
-
 }
-
