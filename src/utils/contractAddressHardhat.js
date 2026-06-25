@@ -1,15 +1,14 @@
-export const LocalBankSourceAddress = "0x14FC6bDcD7aC30fe82490FC18bdD57d546675566";     
-export const LocalBankMoneyAddress = "0x42a3Eb45314B075B21C005bD0f9dFF07C3a82839";     
-export const GuildBankPassportAddress = "0x75657FA362A107c2166dD2946437EcBa83b108A2";  
-export const LocalBankTimeLockAddress = "0x3D375c6550fa25CD599A127770F258B12b573feB";   
-export const LocalBankGovernorAddress = "0xd26D929af14f6322B6607511b6eB9Ba42C78f4EC";   
-export const LocalBankGovernorElectionAddress = "0x8F1e724730A15Da206D30FaaaE826f309244666a"; 
-export const LocalBankGovernorBallotAddress = "0xa2587845A56E8d57dE15A45B671976189b70f4d6";   
-export const LocalBankBoDAddress = "0xa78Ae8Ca40A949c236a69DDD28Bc0325CeD9eE5E";       
-export const LocalBankBoDTreasuryAddress = "0xf2B1d2ca506AD147AcCb82c8bb1CFEEE23930697"; 
-export const LocalBankGovernorTreasuryAddress = "0x9853c1C26B4A56Fd5cf30A44a091E56F60Fb8205"; 
-export const LocalBankAccessManagerAddress = "0x789078b4eFFc7941B0F0BA12049274277b837F0d";
-
+export const LocalBankSourceAddress = "0xd356697bD964f4071c5843e5E1E3CA4C7e2d69c3";
+export const LocalBankMoneyAddress = "0x93F06Ae2adae1081b6cd8E3F3A68EB6e1Ef32AFa";
+export const GuildBankPassportAddress = "0x9548C2C036058785f5849352a63D6415af66B43A"; // kept the latest GuildBank passport
+export const LocalBankTimeLockAddress = "0xF8728937B577aaE9A3f98F3074F1025faa2BAa8D";
+export const LocalBankGovernorAddress = "0x461D357CEF03477160580467F614479413481024";
+export const LocalBankGovernorElectionAddress = "0xc639C8DcfEf3e1e139f5b9636A95f8859682F480";
+export const LocalBankGovernorBallotAddress = "0xa34cA38C8FE31F5b4F76273AdD6d01046AC3210e";
+export const LocalBankBoDAddress = "0xa649e9bd40D47c4b75E0c8fA806520DF8287531b";
+export const LocalBankBoDTreasuryAddress = "0x8A34641bd37378B3659d88591Dc442ac755a3a18";
+export const LocalBankGovernorTreasuryAddress = "0x6c07c5a7dE57d1Cf01d60BF5Ca8A6474D8655AE0";
+export const LocalBankAccessManagerAddress = "0xf8f74A027fC2b4E48cb57926668780aC2e3fdF1b";
 
 export const contractAddresses = {
   Source: LocalBankSourceAddress,
