@@ -3,7 +3,7 @@ import crypto from 'crypto';
 import { SecretsManagerClient, GetSecretValueCommand } from '@aws-sdk/client-secrets-manager';
 import { NextResponse } from 'next/server';
 import { prepareContractCall, sendTransaction, waitForReceipt } from 'thirdweb';
-import { gameContractMoneyDAO, gameContractSourceDAO } from '@/utils/functionDump/getContracts';
+import { contractMoneyDAO, contractSourceDAO } from '@/utils/functionDump/getContracts';
 import { privateKeyToAccount } from 'thirdweb/wallets';
 import { client } from '@/utils/thirdweb/client';
 
@@ -201,7 +201,7 @@ export async function POST(req) {
     if (dailyCount > 0) {
       console.log('Minting MoneyDAO tokens:', dailyCount);
       const transaction = prepareContractCall({
-        contract: gameContractMoneyDAO,
+        contract: contractMoneyDAO,
         method: 'function Mint(address _user, uint256 _times)',
         params: [wallet, BigInt(dailyCount)],
       });
@@ -211,7 +211,7 @@ export async function POST(req) {
 
       const dailyReceipt = await waitForReceipt({
         client,
-        chain: gameContractMoneyDAO.chain,
+        chain: contractMoneyDAO.chain,
         transactionHash,
       });
       console.log('Daily mint confirmed:', dailyReceipt.status);
@@ -251,7 +251,7 @@ export async function POST(req) {
     if (weeklyCount > 0) {
       console.log('Minting SourceDAO tokens:', weeklyCount);
       const transaction = prepareContractCall({
-        contract: gameContractSourceDAO,
+        contract: contractSourceDAO,
         method: 'function Mint(address _user, uint256 _times)',
         params: [wallet, BigInt(weeklyCount)],
       });
@@ -261,7 +261,7 @@ export async function POST(req) {
 
       const weeklyReceipt = await waitForReceipt({
         client,
-        chain: gameContractSourceDAO.chain,
+        chain: contractSourceDAO.chain,
         transactionHash,
       });
       console.log('Weekly mint confirmed:', weeklyReceipt.status);
