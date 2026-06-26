@@ -1,14 +1,14 @@
-export const LocalBankSourceAddress = "0x1d912898C5D0F018357dA48C65dF2C3c9E1172BB"; // LocalBankDAOcoin
-export const LocalBankMoneyAddress = "0x74DeBb1d6A257407de42a5C386AAaE410A8B20a0"; // LocalBankCredit
-export const GuildBankPassportAddress = "0xeE636C93c6adf9b9aa3ccE12c987Be8aFF376D39"; // kept the latest GuildBank passport
-export const LocalBankTimeLockAddress = "0xD872A5B28c07f248A6F4f1B599d1Ba1c646fa06a";
-export const LocalBankGovernorAddress = "0xDc3Cc94053EaCCEa5c8503ef6cC8757BbbC52766";
-export const LocalBankGovernorElectionAddress = "0xD0818e5cB0cc6EC5915371bE336F3c000c096a3c";
-export const LocalBankGovernorBallotAddress = "0x2f96FA3c5D87786e6E63F7F39A5048A57A634743";
-export const LocalBankBoDAddress = "0x0f9B91c77562bd7f72f433e837c5C96F87eb629b";
-export const LocalBankBoDTreasuryAddress = "0x6a12dcE2510A899eB006AEA7a947dDBE3F2342Be";
-export const LocalBankGovernorTreasuryAddress = "0x0502412e5D03D07F5EF894536B606174A73F056b";
-export const LocalBankAccessManagerAddress = "0x51ef574CE38979E3A6984bd2f1F864249DDDB662";
+export const LocalBankSourceAddress = "0xc0997a06fd7B2D3794468c03D4033C7D803D69cd"; 
+export const LocalBankMoneyAddress = "0x62bdB107996d0D7657fc808ec31b4D372d5823FD"; 
+export const GuildBankPassportAddress = "0xe867e86da50Cd498D7165a5051353F3c2949f6e4"; 
+export const LocalBankTimeLockAddress = "0x87AAB8E1c1B2162F5a65c18371f69734b6c0efda";
+export const LocalBankGovernorAddress = "0x286C44B5498C2c1f000911328f4C4f813616FB3b";
+export const LocalBankGovernorElectionAddress = "0x94ac6C355A25BeE6f1b067E627F2C984890A5C0d";
+export const LocalBankGovernorBallotAddress = "0xa1C0b2FA3090E7AEB74F97784dA3bbe87D77a436";
+export const LocalBankBoDAddress = "0x9A8479Ef31A0aaF12Ea49762dF0bc0E3C5D5E075";
+export const LocalBankBoDTreasuryAddress = "0x0Fd5E4e046A11858d136eFdCAc884EeefFfAfE08";
+export const LocalBankGovernorTreasuryAddress = "0x7F57F8311d14D4Ae76D634a8A6F1d891b30Fb637";
+export const LocalBankAccessManagerAddress = "0xFca22FBB2b367dABD5A8a926B075Be17a1756703";
 
 export const contractAddresses = {
   Source: LocalBankSourceAddress,
