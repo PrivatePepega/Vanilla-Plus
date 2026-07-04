@@ -4,6 +4,8 @@ import { SecretsManagerClient, GetSecretValueCommand } from '@aws-sdk/client-sec
 import { NextResponse } from 'next/server';
 import { readContract } from 'thirdweb';
 import { contractPassport } from "@/utils/functionDump/getContracts";
+import { Ratelimit } from '@upstash/ratelimit';
+import { Redis } from '@upstash/redis';
 
 function getCurrentWeek() {
   const now = new Date();
@@ -54,18 +56,24 @@ function formatPemKey(key) {
 }
 
 
+const redis = new Redis({
+  url: process.env.UPSTASH_REDIS_REST_URL,
+  token: process.env.UPSTASH_REDIS_REST_TOKEN,
+});
+
+const authPingLimiter = new Ratelimit({
+  redis,
+  limiter: Ratelimit.slidingWindow(10, '1 m'),
+});
+
 
 export async function POST(request) {
-  const serverPublicKey = `-----BEGIN PUBLIC KEY-----
-MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA6lf5oWbDy1X0Cgq2ExZI
-DV+6PDoTZit0DpGcswwcTuhWhDacg3aAhcuDW7aWo5cETMhhJGwxueixRg1C8nvr
-dHalIE8S3rXrHiEh2AQX91w6Yg1SemUA6ves+2Tw9Ir1pKjFTsghjMGT1bIBe674
-u8h1AUf7hSTh1AHeiWfxY6SxCx6na50ZC5Ye0ryIHajukLd4e5Y08Lyza074Ijsj
-yRiIvZ1QXHhANqI7diFKP4s1zblYVqc9EFbb3g2zw8fGdCz7E0Ax5pR5lFSVCS55
-J3KZA4whyoSYdclDJ6QWkFUO4ZeDetqdT2FQAyHGQPFeiCRxYhE/FeK/aH2ZAyKP
-EQIDAQAB
------END PUBLIC KEY-----`;
 
+  const ip = req.headers.get('x-forwarded-for') ?? '127.0.0.1';
+  const { success } = await authPingLimiter.limit(ip);
+  if (!success) {
+    return Response.json({ error: 'Too many requests' }, { status: 429 });
+  }
 
 
   async function getSecrets() {

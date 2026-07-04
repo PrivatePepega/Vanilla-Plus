@@ -3,9 +3,10 @@ import crypto from 'crypto';
 import { SecretsManagerClient, GetSecretValueCommand } from '@aws-sdk/client-secrets-manager';
 import { NextResponse } from 'next/server';
 import { prepareContractCall, sendTransaction, waitForReceipt } from 'thirdweb';
-import { contractMoneyDAO, contractSourceDAO } from '@/utils/functionDump/getContracts';
+import { gameContractMoneyDAO, gameContractSourceDAO } from '@/utils/functionDump/getContracts';
 import { privateKeyToAccount } from 'thirdweb/wallets';
 import { client } from '@/utils/thirdweb/client';
+import { rateLimiter } from '@/lib/rateLimit';
 
 
 
@@ -13,7 +14,11 @@ export async function POST(req) {
   try {
     console.log('Received POST request to /api/verify-files');
 
-
+    const ip = req.headers.get('x-forwarded-for') ?? '127.0.0.1';
+    const { success } = await rateLimiter.limit(ip);
+    if (!success) {
+      return Response.json({ error: 'Too many requests, try again later' }, { status: 429 });
+    }
     
     async function getSecrets() {
       const secretsManager = new SecretsManagerClient({
@@ -201,7 +206,7 @@ export async function POST(req) {
     if (dailyCount > 0) {
       console.log('Minting MoneyDAO tokens:', dailyCount);
       const transaction = prepareContractCall({
-        contract: contractMoneyDAO,
+        contract: gameContractMoneyDAO,
         method: 'function Mint(address _user, uint256 _times)',
         params: [wallet, BigInt(dailyCount)],
       });
@@ -211,7 +216,7 @@ export async function POST(req) {
 
       const dailyReceipt = await waitForReceipt({
         client,
-        chain: contractMoneyDAO.chain,
+        chain: gameContractMoneyDAO.chain,
         transactionHash,
       });
       console.log('Daily mint confirmed:', dailyReceipt.status);
@@ -251,7 +256,7 @@ export async function POST(req) {
     if (weeklyCount > 0) {
       console.log('Minting SourceDAO tokens:', weeklyCount);
       const transaction = prepareContractCall({
-        contract: contractSourceDAO,
+        contract: gameContractSourceDAO,
         method: 'function Mint(address _user, uint256 _times)',
         params: [wallet, BigInt(weeklyCount)],
       });
@@ -261,7 +266,7 @@ export async function POST(req) {
 
       const weeklyReceipt = await waitForReceipt({
         client,
-        chain: contractSourceDAO.chain,
+        chain: gameContractSourceDAO.chain,
         transactionHash,
       });
       console.log('Weekly mint confirmed:', weeklyReceipt.status);
