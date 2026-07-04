@@ -6,7 +6,7 @@ import { prepareContractCall, sendTransaction, waitForReceipt } from 'thirdweb';
 import { gameContractMoneyDAO, gameContractSourceDAO } from '@/utils/functionDump/getContracts';
 import { privateKeyToAccount } from 'thirdweb/wallets';
 import { client } from '@/utils/thirdweb/client';
-import { rateLimiter } from '@/lib/rateLimit';
+import { rateLimiter } from '@/utils/lib/rateLimit';
 
 
 
