@@ -48,7 +48,7 @@ const Mint = () => {
     });
     const { data: nextMintableDao, isLoading: nextMintableDaoLoading } = useReadContract({
       contract: contractSourceDAO,
-      method: "function nextMintable() returns (uint256)",
+      method: "function lastMinted() returns (uint256)",
     });
 
     const dateDAO = new Date(Number(nextMintableDao) * 1000); // JS needs milliseconds
@@ -78,7 +78,7 @@ const Mint = () => {
 
     const { data: nextMintablemoney, isLoading: nextMintablemoneyLoading } = useReadContract({
       contract: contractMoneyDAO,
-      method: "function nextMintable() returns (uint256)",
+      method: "function lastMinted() returns (uint256)",
     });
     const dateMoney = new Date(Number(nextMintablemoney) * 1000); // JS needs milliseconds
     const formattedDatemoney = dateMoney.toLocaleString();
