@@ -100,6 +100,9 @@ const Mint = () => {
         <div className="flex flex-col justify-center items-center">
           <h2>dao reward amount: ({Number(daoAmount)})</h2>
           <h3>next mint: {formattedDate}</h3>
+          
+          <h3>date {nextMintablemoney}</h3>
+
           <ButtonGroup>
             <Button onClick={()=> {handleDAONoMint()}}>punish</Button>
           </ButtonGroup>
@@ -120,9 +123,10 @@ const Mint = () => {
 
 
       <div className="flex flex-col justify-center items-center my-6">
-        <a  href="https://github.com/PrivatePepega/GuildBank-App" rel="noopener noreferrer" target="_blank">
+
+        <Button  href="https://github.com/PrivatePepega/GuildBank-App" rel="noopener noreferrer" target="_blank">
           Github Link
-        </a>
+        </Button>
         <h2>Read the github docs underneath for a better explanation</h2>
       </div>
 
