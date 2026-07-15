@@ -51,8 +51,9 @@ const Mint = () => {
       method: "function lastMinted() returns (uint256)",
     });
 
-    const dateDAO = new Date(Number(nextMintableDao) * 1000); // JS needs milliseconds
-    const formattedDate = dateDAO.toLocaleString();
+    const dateDAO = nextMintableDao
+    ? new Date((Number(nextMintableDao) + 8 * 24 * 60 * 60) * 1000).toLocaleString()
+    : "Loading...";
 
 
 
@@ -80,8 +81,9 @@ const Mint = () => {
       contract: contractMoneyDAO,
       method: "function lastMinted() returns (uint256)",
     });
-    const dateMoney = new Date(Number(nextMintablemoney) * 1000); // JS needs milliseconds
-    const formattedDatemoney = dateMoney.toLocaleString();
+    const dateMoney = nextMintablemoney
+    ? new Date((Number(nextMintablemoney) + 2 * 24 * 60 * 60) * 1000).toLocaleString()
+    : "Loading...";
 
 
 
@@ -99,10 +101,7 @@ const Mint = () => {
 
         <div className="flex flex-col justify-center items-center">
           <h2>dao reward amount: ({Number(daoAmount)})</h2>
-          <h3>next mint: {formattedDate}</h3>
-          
-          <h3>date {nextMintablemoney}</h3>
-
+          <h3>next mint: {dateDAO}</h3>
           <ButtonGroup>
             <Button onClick={()=> {handleDAONoMint()}}>punish</Button>
           </ButtonGroup>
@@ -111,7 +110,7 @@ const Mint = () => {
 
         <div className="flex flex-col justify-center items-center">
           <h2>money reward amount: ({Number(moneyAmount)})</h2>
-          <h3>next mint: {formattedDatemoney}</h3>
+          <h3>next mint: {dateMoney}</h3>
           <ButtonGroup>
             <Button onClick={()=> {handleMoneyNoMint()}}>punish</Button>
           </ButtonGroup>
