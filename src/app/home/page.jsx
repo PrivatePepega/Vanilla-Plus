@@ -3,11 +3,13 @@
 
 
 import MaterialCard from '@/components/MaterialCard'; // Adjust the path as necessary
+import GuildBankCard from '@/components/GuildBankCard'; // Adjust the path as necessary
+import LocalBankCard from '@/components/LocalBankCard'; // Adjust the path as necessary
+
 
 import InformationGallery from '@/components/InformationGallery'; // Adjust the path as necessary
 
-import GuildBankCard from '@/components/GuildBankCard'; // Adjust the path as necessary
-import LocalBankCard from '@/components/LocalBankCard'; // Adjust the path as necessary
+
 
 
 
@@ -43,10 +45,13 @@ const page = () => {
               <LocalBankCard />
           </div>
         </div>
-        <div>
+        <div className='flex flex-col gap-2'>
+          <h2 className='text-4xl my-8'>
+            Newsletter
+          </h2>
           <InformationGallery />
         </div>
-        <Socials/>
+        <Socials />
       </div>  
       )
   }
