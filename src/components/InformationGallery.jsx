@@ -101,7 +101,7 @@ const InformationGallery = () => {
               height={300}
               onClick={() => {setDataID(item.id); scrollToBottom();}}
               src={item.imglink}
-              className="h-20 max-w-full cursor-pointer rounded-lg object-cover object-center"
+              className="h-25 max-w-full cursor-pointer rounded-lg object-cover object-center"
               alt="gallery-image"
             />
           </div>
